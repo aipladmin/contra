@@ -28,12 +28,12 @@ def create_app():
 
     
 
-    mysql = MySQL()
-    app.config['MYSQL_DATABASE_USER'] = 'admin'
-    app.config['MYSQL_DATABASE_PASSWORD'] = 'adminadmin'
-    app.config['MYSQL_DATABASE_DB'] = 'finrep'
-    app.config['MYSQL_DATABASE_HOST'] =  'aipldb.cttdwedcfzhs.ap-south-1.rds.amazonaws.com'
-    mysql.init_app(app)
+    # mysql = MySQL()
+    # app.config['MYSQL_DATABASE_USER'] = 'admin'
+    # app.config['MYSQL_DATABASE_PASSWORD'] = 'adminadmin'
+    # app.config['MYSQL_DATABASE_DB'] = 'finrep'
+    # app.config['MYSQL_DATABASE_HOST'] =  'aipldb.cttdwedcfzhs.ap-south-1.rds.amazonaws.com'
+    # mysql.init_app(app)
 
     mail = Mail()
     app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -52,6 +52,10 @@ def create_app():
     )
 
     app.register_blueprint(auth.bp)
-    
+
+    from app.controller.admin import (
+        admin
+    )
+    app.register_blueprint(admin.admin)
 
     return app
