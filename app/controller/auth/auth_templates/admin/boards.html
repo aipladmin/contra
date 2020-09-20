@@ -1,0 +1,134 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Arduino Boards</h1>
+      <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Arduino Board</button>
+    </div>
+    
+<!-- Modal -->
+<div class="modal fade" id="exampleModal"  id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Arduino Board</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" action="{{ url_for('admin.boardscr') }}">
+                <div class="form-group row">
+                  <label for="staticEmail" class="col-sm-2 col-form-label">Arduino Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" name="name" class="form-control" id="staticEmail">
+                  </div>
+                </div>
+                <div class="form-group row">
+                    <label for="staticEmail" class="col-sm-2 col-form-label">Unique ID</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="UBID" readonly class="form-control" id="staticEmail" value="{{ arduinoID }}">
+                    </div>
+                  </div>
+                <div class="form-group row">
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Select Sensors</label>
+                  <div class="col-sm-10">
+                    <select class="custom-select" name="sensors" multiple>
+                      {% for items in sensor_data %}
+                      <option value="{{ items['SID'] }}">{{ items['sensor_name'] }}</option>
+                      {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">
+                      Press CTRL and right-click to select multiple options.
+                    </small>
+                  </div>
+                </div>
+              
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" name="insert" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+  <br/>
+
+  <div class="container">
+    <h1 class="h3 mb-0 text-gray-900">Boards</h1>
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Board Name</th>
+          <th scope="col">UBID</th>
+          <th scope="col">Update</th>
+          <th scope="col">Delete</th>
+          <th scope="col">Sensors</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for items in boards %}
+        
+        <form method="POST" action="{{ url_for('admin.boardscr') }}">
+        <tr>
+          <td ><input type="text" name="name"  class="form-control" id="staticEmail" value="{{ items['Name'] }}"></td>
+          <td ><input type="text" name="UBID" readonly class="form-control" id="staticEmail" value="{{ items['UBID'] }}"></td>
+          <td ><button type="submit" class="btn btn-success" name="update" value="{{ items['BID'] }}"> Update </button></td>
+          <td ><button type="submit" class="btn btn-danger" name="delete" value="{{ items['BID'] }}"> Delete </button></td>
+          <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{ items['Name'] }}">Sensor</button></td> 
+        </tr>
+        </form>
+      </tbody>
+    </table>
+        <div class="modal fade" id="{{ items['Name'] }}" tabindex="-1"  aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Attached Sensor</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body text-dark">
+                
+                <table class="table">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th scope="col">Sensor Name</th>
+                      <th scope="col">Type </th>
+                      <th scope="col">Delete</th>
+                      
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for sd in sensors  %}
+                {% if sd['BID'] == items['identifier'] %}  
+                    
+                <tr>
+
+                      <td>{{ sd['Sensor_Name'] }}</td>
+                      <td>{{ sd['Type'] }}</td>
+                      <td><button type="submit" class="btn btn-danger" name="sensor_delete" value="{{ sd['mid'] }}">Delete</td>
+                    </tr>
+                {% endif %}
+                {% endfor %}
+                
+                </tbody>
+                </table>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+              </div>
+            </div>
+           </div>
+        </div>
+        {% endfor %}        
+      </div>
+    </div>
+
+{% endblock %}
