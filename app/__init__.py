@@ -6,16 +6,6 @@ from flaskext.mysql import MySQL
 
 from .config import Config
 
-
-# try:
-#     # Trying to find module in the parent package
-#     from . import config
-#     print('config')
-#     del config
-# except ImportError:
-#     print('******************************Relative import failed')
-
-
 def create_app():
     app = Flask(
         __name__,
@@ -47,15 +37,11 @@ def create_app():
 
 
 
-    from app.controller import (
-        auth
+    from app.controller.auth import (
+        auth,admin
     )
 
-    app.register_blueprint(auth.bp)
-
-    from app.controller.admin import (
-        admin
-    )
+    app.register_blueprint(auth.auth)
     app.register_blueprint(admin.admin)
 
     return app
