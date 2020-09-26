@@ -60,30 +60,46 @@
 
   <div class="container">
     <h1 class="h3 mb-0 text-gray-900">Boards</h1>
-    <table class="table">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Board Name</th>
-          <th scope="col">UBID</th>
-          <th scope="col">Update</th>
-          <th scope="col">Delete</th>
-          <th scope="col">Sensors</th>
-        </tr>
-      </thead>
-      <tbody>
+    
         {% for items in boards %}
-        
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Board Name</th>
+              <th scope="col">UBID</th>
+              <th scope="col">Update</th>
+              <th scope="col">Delete</th>
+              <th scope="col">Sensors</th>
+              <th scope="col">API Endpoint</th>
+            </tr>
+          </thead>
+          <tbody>
         <form method="POST" action="{{ url_for('admin.boardscr') }}">
         <tr>
+        
           <td ><input type="text" name="name"  class="form-control" id="staticEmail" value="{{ items['Name'] }}"></td>
           <td ><input type="text" name="UBID" readonly class="form-control" id="staticEmail" value="{{ items['UBID'] }}"></td>
-          <td ><button type="submit" class="btn btn-success" name="update" value="{{ items['BID'] }}"> Update </button></td>
-          <td ><button type="submit" class="btn btn-danger" name="delete" value="{{ items['BID'] }}"> Delete </button></td>
-          <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{ items['Name'] }}">Sensor</button></td> 
+          <td ><button type="submit" class="btn btn-success" name="update_boards"> Update </button></td>
+          <td ><button type="submit" class="btn btn-danger" name="delete_boards"> Delete </button></td>
+          <td ><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{ items['Name'] }}" ><i class="fas fa-plus fa-sm "></i> Sensor</button></td> 
+          
+            {% set api = [request.host_url|string~"api/v1?"~"UBID="~items['UBID']~"&"] %}
+            
+            {% for sd in sensors  %}
+                {% if sd['BID'] == items['identifier'] %}  
+                  <!-- {{ [sd['Sensor_Name']] }} -->
+                  {{ api.extend(sd['Sensor_Name']~"=&") }}
+                {% endif %}
+            {% endfor %}
+            <td><button type="button" class="btn btn-secondary" data-container="body" data-toggle="popover" data-placement="top" data-content="{{ api[:-1]|join('') }}">
+              API Endpoint
+            </button></td>
+
         </tr>
         </form>
       </tbody>
     </table>
+  
         <div class="modal fade" id="{{ items['Name'] }}" tabindex="-1"  aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -101,19 +117,16 @@
                       <th scope="col">Sensor Name</th>
                       <th scope="col">Type </th>
                       <th scope="col">Delete</th>
-                      
                     </tr>
                   </thead>
                   <tbody>
                     {% for sd in sensors  %}
                 {% if sd['BID'] == items['identifier'] %}  
-                    
                 <tr>
-
-                      <td>{{ sd['Sensor_Name'] }}</td>
-                      <td>{{ sd['Type'] }}</td>
-                      <td><button type="submit" class="btn btn-danger" name="sensor_delete" value="{{ sd['mid'] }}">Delete</td>
-                    </tr>
+                  <td>{{ sd['Sensor_Name'] }}</td>
+                  <td>{{ sd['Type'] }}</td>
+                  <td><button type="submit" class="btn btn-danger" name="sensor_delete" value="{{ sd['mid'] }}">Delete</td>
+                </tr>
                 {% endif %}
                 {% endfor %}
                 
@@ -128,7 +141,6 @@
            </div>
         </div>
         {% endfor %}        
-      </div>
-    </div>
-
+      <!-- <div> -->
+    </div> 
 {% endblock %}

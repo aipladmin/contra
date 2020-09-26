@@ -1,0 +1,110 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Germination</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
+    
+    <form method="POST" action="{{ url_for('admin.germination_scr') }}">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputEmail4">Attempt Name</label>
+            <input type="text" name="attemptname"class="form-control" id="inputEmail4">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputPassword4">Location</label>
+            <input type="text" name="location" class="form-control" id="inputPassword4">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputAddress">Plant Name</label>
+          <input type="text" name="plantname" class="form-control" id="inputAddress">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputCity">Water PH</label>
+            <input type="text" name="waterph" class="form-control" id="inputCity">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="inputZip">WaterTDS/EC</label>
+            <input type="text" name="watertds" class="form-control" id="inputZip">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputAddress2">Cocopeat EC value</label>
+            <input type="text" name="Cocopeatecvalue" class="form-control" id="inputAddress2">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputAddress2">Sowing Date</label>
+            <input type="Date" name="sowingdate" class="form-control" id="inputAddress2">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputAddress2">Grow Medium</label>
+            <input type="text" name="growmedium" class="form-control" id="inputAddress2">
+          </div>
+          
+        </div>
+        
+        
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="inputAddress2">Light Source</label>
+            <input type="text" name="lightsource" class="form-control" id="inputAddress2">
+          </div>
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Seed Company</label>
+                <input type="text" name="seedcompany" class="form-control" id="inputAddress2">
+            </div>
+            <div class="form-group col-md-4">
+              <label for="inputAddress2">Seed Variety</label>
+              <input type="text" name="svariety" class="form-control" id="inputAddress2">
+          </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Soaked Seeds</label>
+                <input type="text" name="soakedseeds" class="form-control" id="inputAddress2">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Unsoaked Seeds</label>
+                <input type="text" name="unsoakedseeds" class="form-control" id="inputAddress2">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Total</label>
+                <input type="text" name="total" class="form-control" id="inputAddress2">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="inputAddress2">Germination Date</label>
+                <input type="date" name="germinationdate" class="form-control" id="inputAddress2">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputAddress2">Avg Germination Duration</label>
+                <input type="text" name="avgerminationduration" class="form-control" id="inputAddress2">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Avg Time of True Leaves</label>
+                <input type="text" name="averagetimeoftrueleaves" class="form-control" id="inputAddress2">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Average Sapling Height</label>
+                <input type="text" name="averagesaplingheight" class="form-control" id="inputAddress2">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputAddress2">Sapling Transplant Date</label>
+                <input type="date" name="saplingtransplantdate" class="form-control" id="inputAddress2">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+</div>
+
+{% endblock %}
