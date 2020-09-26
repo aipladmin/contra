@@ -38,10 +38,12 @@ def create_app():
 
 
     from app.controller.auth import (
-        auth,admin
+        auth,admin,api
     )
+    
 
     app.register_blueprint(auth.auth)
     app.register_blueprint(admin.admin)
-
+    app.register_blueprint(api.api)
+    
     return app
