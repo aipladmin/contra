@@ -33,6 +33,7 @@ def mysql_query(sql):
         connection.close()
         return data
     if sql.strip().split(' ')[0].lower() != "select" :
+        print(sql)
         cursor.execute(sql)
         print(cursor._executed)
         
