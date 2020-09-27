@@ -50,7 +50,8 @@
         </div>
       </li>
     
-      
+      {% endif %}
+      {% if session['role'].lower() =="user" or session['role'].lower() == "admin"  %}
       <!-- Divider -->
       <hr class="sidebar-divider">
       
@@ -65,8 +66,8 @@
         <div id="Germination" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom Components:</h6>
-            <a class="collapse-item" href="{{ url_for('admin.germination') }}"><--Header--> value </a>
-            <a class="collapse-item" href="{{ url_for('admin.germination') }}">Sensors</a>
+            <a class="collapse-item" href="{{ url_for('admin.germination') }}">Germination </a>
+            <a class="collapse-item" href="{{ url_for('admin.germinationweekly') }}">Germination Weekly</a>
           </div>
         </div>
       </li>
