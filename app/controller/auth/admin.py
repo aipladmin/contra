@@ -104,3 +104,25 @@ def germination_scr():
                             request.form['averagesaplingheight'],request.form['saplingtransplantdate'] ) )
         return "post"
     return "germination_scr"
+
+@admin.route('/germinationweekly')
+def germinationweekly():
+    data = mysql_query("select *,date(convert_tz(now(),'+00:00','+05:30')) as 'Curdate' from germination;")
+    return render_template('admin/germinationlist.html',data=data)
+
+@admin.route('/germinationweekly_scr',methods=['POST'])
+def germinationweekly_scr():
+    if request.method == "POST":
+        # period = request.form['period_of_time']
+        data_exists = mysql_query("select count(*),Period from days where GID={}".format(request.form['attempt_id']))
+        print(data_exists)
+        mysql_query("insert into days(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH) values({},'{}','{}','{}',{},{},{});"
+                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'] ) ) 
+        return redirect(url_for('admin.germinationweekly'))
+        
+        # period = request.form['period_of_time']
+        # if period.lower() == "morning":
+        #     mysql_query("insert into days(GID,date,Morning_Dosage_Time,Morning_Dosage_Volume,Evening_Dosage_Time,Evening_Dosage_Volume,Dosage_EC,Dosage_PH) values({},'{}',{},{},{},{},{},{});"
+        #                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time']) )
+        
+    return "germinationweekly_scr"
