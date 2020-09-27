@@ -1,0 +1,105 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+  
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Germination Weekly</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
+    <div class="table-responsive-sm">
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Attempt Name</th>
+                <th scope="col">Location</th>
+                <th scope="col">Plant Name</th>
+                <th scope="col">Insert Entry</th>
+
+              </tr>
+            </thead>
+            <tbody>
+                {% for dt in data %}
+
+              <tr>
+                <td>{{ dt['Attempt_Name'] }}</td>
+                <td>{{ dt['Location'] }}</td>
+                <td>{{ dt['Plant_Name'] }}</td>
+                <td>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#{{ dt['Attempt_Name']~dt['Location'] }}">
+                        <i class="fas fa-plus-circle"></i> Insert Data
+                    </button>
+                </td>
+              </tr>
+
+            <div class="modal" id="{{ dt['Attempt_Name']~dt['Location'] }}">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Insert Daily Data</h4>
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                           <form method="POST" action="{{ url_for('admin.germinationweekly_scr') }}">
+                                <div class="form-group">
+                                  <label for="formGroupExampleInput">Attempt ID</label>
+                                  <input type="text" class="form-control" name="attempt_id" readonly id="formGroupExampleInput" value="{{ dt['GID'] }}">
+                                </div>
+                                <div class="form-group">
+                                  <label for="formGroupExampleInput2">Date</label>
+                                  <input type="date" class="form-control" name="date" id="formGroupExampleInput2" value="{{ dt['Curdate'] }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="formGroupExampleInput2">Period of Time</label>
+                                    <select name="period_of_time" class="custom-select">
+                                        <option selected value="" disabled>Choose Period of Time.</option>
+                                        <option value="Morning">Morning</option>
+                                        <option value="Evening">Evening</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Time</label>
+                                        <input type="time" class="form-control" name="time" id="formGroupExampleInput2" placeholder="Another input placeholder">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Volume</label>
+                                        <input type="text" class="form-control" name="volume" id="formGroupExampleInput2">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Dosage EC</label>
+                                        <input type="text" name="dosage_ec" class="form-control" name="volumne" id="formGroupExampleInput2">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Dosage PH</label>
+                                        <input type="text" name="dosage_ph" class="form-control" name="volumne" id="formGroupExampleInput2">
+                                    </div>
+                                </div>
+                             
+                        </div>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Submit </button>
+                    </div>
+                  </form>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </tbody>
+          </table>
+    </div>
+</div>
+
+{% endblock %}
