@@ -54,7 +54,11 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="inputAddress2">Light Source</label>
-            <input type="text" name="lightsource" class="form-control" id="inputAddress2">
+            <select name="lightsource" class="custom-select custom-select-md mb-3">
+              <option selected value="">Select Light Source</option>
+              <option value="Natural Light">Natural Light</option>
+              <option value="Illumination">Illumination</option>
+            </select>
           </div>
             <div class="form-group col-md-4">
                 <label for="inputAddress2">Seed Company</label>
@@ -79,7 +83,7 @@
                 <input type="text" name="total" class="form-control" id="inputAddress2">
             </div>
         </div>
-        <div class="form-row">
+        <!-- <div class="form-row">
             <div class="form-group col-md-6">
                 <label for="inputAddress2">Germination Date</label>
                 <input type="date" name="germinationdate" class="form-control" id="inputAddress2">
@@ -102,7 +106,7 @@
                 <label for="inputAddress2">Sapling Transplant Date</label>
                 <input type="date" name="saplingtransplantdate" class="form-control" id="inputAddress2">
             </div>
-        </div>
+        </div> -->
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
 </div>
