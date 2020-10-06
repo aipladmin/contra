@@ -1,0 +1,40 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+  
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Sensor Data</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
+    <!-- {{ data[0].keys()|list }} -->
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-dark">
+              <tr>
+              {% for column_headers in  data[0].keys()|list  %}
+                <th scope="col">{{ column_headers }}</th>
+              {% endfor %}       
+            </tr>
+            </thead>
+            <tbody>
+              {% for x in data %}
+              <tr>
+                <td> {{x['Name']}} </td>
+                <td> {{x['Humidity_Sensor']}} </td>
+                <td> {{x['Sound_sensor']}} </td>
+                <td> {{x['Temperature_Sensor']}} </td>
+                <td> {{x['Ultrasonic_sensor']}} </td>
+                <td> {{x['Log']}} </td>
+
+              </tr>
+              {% endfor %}
+              </tbody>
+          
+        </table>
+      </div>
+      
+</div>
+
+{% endblock %}
