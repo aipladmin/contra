@@ -126,3 +126,8 @@ def germinationweekly_scr():
         #                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time']) )
         
     return "germinationweekly_scr"
+
+@admin.route('/sensordata')
+def sensordata():
+    data = mysql_query("select boards.Name,sensor_data.Humidity_Sensor,sensor_data.Sound_sensor,sensor_data.Temperature_Sensor,sensor_data.Ultrasonic_sensor,sensor_data.Timestamp as 'Log' from sensor_data inner join boards on boards.BID = sensor_data.BID;")
+    return render_template("admin/sensordata.html",data=data)

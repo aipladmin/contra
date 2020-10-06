@@ -72,6 +72,27 @@
         </div>
       </li>
       {% endif %}
+      {% if session['role'].lower() =="user" or session['role'].lower() == "admin"  %}
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+      
+      <div class="sidebar-heading">
+        Sensor Data
+      </div>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#sensordata" aria-expanded="true" aria-controls="sensordata">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>Sensor Information</span>
+        </a>
+        <div id="sensordata" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Custom Components:</h6>
+            <a class="collapse-item" href="{{ url_for('admin.sensordata') }}">Sensor Data </a>
+            
+          </div>
+        </div>
+      </li>
+      {% endif %}
       
 
       <!-- Sidebar Toggler (Sidebar) -->
@@ -101,7 +122,17 @@
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
-
+             <!-- Nav Item - Alerts -->
+             <li class="nav-item dropdown no-arrow mx-1">
+              <a class="nav-link dropdown-toggle" href="tel:9998256749" id="alertsDropdown" role="button" title="Contact Admin">
+                <i class="fas fa-phone-alt fa-lg"></i>
+              </a>
+            </li>
+            <li class="nav-item dropdown no-arrow mx-1">
+              <a class="nav-link dropdown-toggle" href=" https://wa.me/919998256749?text=Admin%20Dashboard" id="alertsDropdown" role="button" title="Contact Admin">
+                <i class="fab fa-whatsapp-square fa-lg"></i>
+              </a>
+            </li>
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
