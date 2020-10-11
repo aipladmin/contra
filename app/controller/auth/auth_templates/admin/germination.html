@@ -25,15 +25,19 @@
           <input type="text" name="plantname" class="form-control" id="inputAddress">
         </div>
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-3">
+            <label for="totalplants">Total No of Plants</label>
+            <input type="text"  name="totalplants" class="form-control" id="totalplants">
+          </div>
+          <div class="form-group col-md-3">
             <label for="inputCity">Water PH</label>
             <input type="text" name="waterph" class="form-control" id="inputCity">
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-3">
             <label for="inputZip">WaterTDS/EC</label>
             <input type="text" name="watertds" class="form-control" id="inputZip">
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
             <label for="inputAddress2">Cocopeat EC value</label>
             <input type="text" name="Cocopeatecvalue" class="form-control" id="inputAddress2">
           </div>
@@ -72,43 +76,32 @@
         <div class="form-row">
             <div class="form-group col-md-4">
                 <label for="inputAddress2">Soaked Seeds</label>
-                <input type="text" name="soakedseeds" class="form-control" id="inputAddress2">
+                <input type="text" name="soakedseeds" class="form-control" id="ss" onkeyup="add()" value="0">
             </div>
             <div class="form-group col-md-4">
                 <label for="inputAddress2">Unsoaked Seeds</label>
-                <input type="text" name="unsoakedseeds" class="form-control" id="inputAddress2">
+                <input type="text" name="unsoakedseeds" class="form-control" id="us" onkeyup="add()" value="0">
             </div>
             <div class="form-group col-md-4">
                 <label for="inputAddress2">Total</label>
-                <input type="text" name="total" class="form-control" id="inputAddress2">
+                <input type="text" readonly name="total" class="form-control" id="total">
             </div>
+            
+
         </div>
-        <!-- <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputAddress2">Germination Date</label>
-                <input type="date" name="germinationdate" class="form-control" id="inputAddress2">
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputAddress2">Avg Germination Duration</label>
-                <input type="text" name="avgerminationduration" class="form-control" id="inputAddress2">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Avg Time of True Leaves</label>
-                <input type="text" name="averagetimeoftrueleaves" class="form-control" id="inputAddress2">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Average Sapling Height</label>
-                <input type="text" name="averagesaplingheight" class="form-control" id="inputAddress2">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Sapling Transplant Date</label>
-                <input type="date" name="saplingtransplantdate" class="form-control" id="inputAddress2">
-            </div>
-        </div> -->
+       
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
 </div>
-
+<script>
+  function add()
+  {
+    var ss = document.getElementById("ss").value;
+    var us = document.getElementById("us").value;
+    var sum = parseInt(ss)+parseInt(us);
+    // alert(ss);
+    var display_value = document.getElementById('total');
+    display_value.value=parseInt(sum);
+  }
+</script>
 {% endblock %}
