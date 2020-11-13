@@ -110,7 +110,7 @@ def germinationweekly():
 @admin.route('/germinationweekly_scr',methods=['POST'])
 def germinationweekly_scr():
     if request.method == "POST":
-      if 'weekly' in request.form:
+        if 'weekly' in request.form:
 
             mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
