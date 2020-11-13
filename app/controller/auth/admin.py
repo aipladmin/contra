@@ -1,6 +1,7 @@
 from flask import Flask, render_template, Blueprint, request, g, session, redirect, url_for
 import secrets
 from werkzeug.datastructures import ImmutableMultiDict
+from werkzeug.exceptions import RequestEntityTooLarge
 from ..sqlq import *
 
 admin = Blueprint('admin',
@@ -74,7 +75,8 @@ def germination():
 @admin.route('/germination_scr',methods=['POST'])
 def germination_scr():
     if request.method == "POST":
-        mysql_query('''INSERT INTO `contra`.`germination`
+            total = request.form['soakedseeds']+request.form['unsoakedseeds']
+            mysql_query('''INSERT INTO `contra`.`germination`
                             (`Attempt_Name`,
                             `Location`,
                             `Plant_Name`,
@@ -87,22 +89,17 @@ def germination_scr():
                             `Seed_Company`,
                             `Seed_Variety`,
                             `Soaked_Seeds`,
-                            `Un_Soaked_Seeds`,
+                            `Unsoaked_Seeds`,
                             `Total`,
-                            `Germination_Date`,
-                            `Avg_Germination_Duration`,
-                            `Avg_True_Leaves`,
-                            `Avg_Sapling_Height`,
-                            `Sapling_Transplant_Date`)
+                            `Total_Plants`)
                             VALUES
-                            ('{}','{}','{}',{},{},{},'{}','{}','{}','{}','{}',{},{},{},'{}',{},{},{},'{}');'''
+                            ('{}','{}','{}',{},{},{},'{}','{}','{}','{}','{}',{},{},{},{});'''
                             .format(request.form['attemptname'],request.form['location'],request.form['plantname'],
                             request.form['Cocopeatecvalue'],request.form['waterph'],request.form['watertds'],request.form['sowingdate'],
                             request.form['growmedium'],request.form['lightsource'],request.form['seedcompany'],request.form['svariety'],
-                            request.form['soakedseeds'],request.form['unsoakedseeds'],request.form['total'],
-                            request.form['germinationdate'],request.form['avgerminationduration'],request.form['averagetimeoftrueleaves'],
-                            request.form['averagesaplingheight'],request.form['saplingtransplantdate'] ) )
-        return "post"
+                            request.form['soakedseeds'],request.form['unsoakedseeds'],total,request.form['totalplants']))
+            return "post"
+
     return "germination_scr"
 
 @admin.route('/germinationweekly')
@@ -113,8 +110,8 @@ def germinationweekly():
 @admin.route('/germinationweekly_scr',methods=['POST'])
 def germinationweekly_scr():
     if request.method == "POST":
+      if 'weekly' in request.form:
 
-          if 'weekly' in request.form:
             mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
             return redirect(url_for('admin.germinationweekly'))
@@ -129,17 +126,13 @@ def germinationweekly_scr():
                         `Hardening_Date`,
                         `Sapling_Transplant_Date`)
                         VALUES
+
                         ({},'{}',{},'{}',{},'{}','{}','{}'); '''.format(request.form['attempt_id'],request.form['date'],request.form['average_germination_duration'],request.form['average_time_of_true_leaves'],request.form['average_sapling_height'],request.form['hardening_cycle'],request.form['hardening_date'],request.form['sapling_transplant_date']))
             return redirect(url_for('admin.germinationweekly'))
 
+
         return redirect(url_for('admin.germinationweekly'))
-        
-        # period = request.form['period_of_time']
-        # if period.lower() == "morning":
-        #     mysql_query("insert into days(GID,date,Morning_Dosage_Time,Morning_Dosage_Volume,Evening_Dosage_Time,Evening_Dosage_Volume,Dosage_EC,Dosage_PH) values({},'{}',{},{},{},{},{},{});"
-        #                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time']) )
-        
-    return "germinationweekly_scr"
+    
 
 @admin.route('/sensordata')
 def sensordata():
