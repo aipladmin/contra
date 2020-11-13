@@ -27,19 +27,94 @@
                 <td>{{ dt['Location'] }}</td>
                 <td>{{ dt['Plant_Name'] }}</td>
                 <td>
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#{{ dt['Attempt_Name']~dt['Location'] }}">
+                    <button type="button" class="btn btn-success" data-toggle="modal" 
+                    data-target="#{{ dt['Attempt_Name']~dt['Plant_Name']|replace(' ','') }}">
                         <i class="fas fa-plus-circle"></i> Insert Data
                     </button>
                 </td>
               </tr>
 
-            <div class="modal" id="{{ dt['Attempt_Name']~dt['Location'] }}">
+            <div class="modal" id="{{ dt['Attempt_Name']~dt['Plant_Name']|replace(' ','') }}">
                 <div class="modal-dialog modal-lg">
                   <div class="modal-content">
 
                     <!-- Modal Header -->
                     <div class="modal-header">
                       <h4 class="modal-title">Insert Daily Data</h4>
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <!-- <div class="table-responsive"> -->
+                           <form method="POST" action="{{ url_for('admin.germinationweekly_scr') }}">
+                                <div class="form-group">
+                                  <label for="formGroupExampleInput">Attempt ID</label>
+                                  <input type="text" class="form-control" name="attempt_id" readonly id="formGroupExampleInput" value="{{ dt['GID'] }}">
+                                </div>
+                                <div class="form-group">
+                                  <label for="formGroupExampleInput2">Date</label>
+                                  <input type="date" class="form-control" name="date" id="formGroupExampleInput2" value="{{ dt['Curdate'] }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="formGroupExampleInput2">Period of Time</label>
+                                    <select name="period_of_time" class="custom-select" required> 
+                                        <option selected value="" disabled>Choose Period of Time.</option>
+                                        <option value="Morning">Morning</option>
+                                        <option value="Evening">Evening</option>
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Time</label>
+                                        <input type="text" class="form-control" name="time" id="formGroupExampleInput2"  >
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Volume</label>
+                                        <input type="text" class="form-control" name="volume" id="formGroupExampleInput2" value="0">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Dosage EC</label>
+                                        <input type="text" name="dosage_ec" class="form-control" name="volumne" id="formGroupExampleInput2" value="0">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="formGroupExampleInput2">Dosage PH</label>
+                                        <input type="text" name="dosage_ph" class="form-control" name="volumne" id="formGroupExampleInput2" value="0">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                  <div class="form-group col-md-6">
+                                      <label for="pesticide">Pesticide</label>
+                                      <input type="text" name="pesticide" class="form-control" name="volumne" id="pesticide" value="0">
+                                  </div>
+                                  <div class="form-group col-md-6">
+                                      <label for="pesticide_volume">Pesticide Volume</label>
+                                      <input type="text" name="pesticide_volume" class="form-control" name="volumne" id="pesticide_volume" value="0">
+                                  </div>
+                                <!-- </div>                              -->
+                        </div>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" name="weekly" class="btn btn-success">Submit </button>
+                    </div>
+                  </form>
+                  </div>
+                </div>
+              </div>
+              <!-- AVERAGE GERMINATION DETAILS -->
+              <div class="modal" id="{{ dt['Attempt_Name'] }}">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                      <h4 class="modal-title">Germination Data</h4>
                       <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
@@ -52,38 +127,46 @@
                                   <input type="text" class="form-control" name="attempt_id" readonly id="formGroupExampleInput" value="{{ dt['GID'] }}">
                                 </div>
                                 <div class="form-group">
-                                  <label for="formGroupExampleInput2">Date</label>
+                                  <label for="formGroupExampleInput2">Germination Date</label>
                                   <input type="date" class="form-control" name="date" id="formGroupExampleInput2" value="{{ dt['Curdate'] }}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="formGroupExampleInput2">Period of Time</label>
-                                    <select name="period_of_time" class="custom-select">
-                                        <option selected value="" disabled>Choose Period of Time.</option>
-                                        <option value="Morning">Morning</option>
-                                        <option value="Evening">Evening</option>
-                                    </select>
+                                    <label for="formGroupExampleInput2">Average Germination Duration</label>
+                                    <input type="text" class="form-control" name="average_germination_duration" id="formGroupExampleInput2">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        <label for="formGroupExampleInput2">Time</label>
-                                        <input type="time" class="form-control" name="time" id="formGroupExampleInput2" placeholder="Another input placeholder">
+                                        <label for="formGroupExampleInput2">Average time of true leaves</label>
+                                        <input type="time" class="form-control" name="average_time_of_true_leaves" id="formGroupExampleInput2" placeholder="Another input placeholder">
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="formGroupExampleInput2">Volume</label>
-                                        <input type="text" class="form-control" name="volume" id="formGroupExampleInput2">
-                                    </div>
+                                      <label for="formGroupExampleInput2">Average Sapling Height</label>
+                                      <input type="text" name="average_sapling_height" class="form-control" name="volumne" id="formGroupExampleInput2">
+                                  </div>
+                                    
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        <label for="formGroupExampleInput2">Dosage EC</label>
-                                        <input type="text" name="dosage_ec" class="form-control" name="volumne" id="formGroupExampleInput2">
+                                        <label for="formGroupExampleInput2">Hardening Cycle</label>
+                                        <select name="hardening_cycle"class="custom-select">
+                                          <option selected>Select Duration</option>
+                                          <option value="Hours">Hours</option>
+                                          <option value="Days">Days</option>
+                                        </select>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="formGroupExampleInput2">Dosage PH</label>
-                                        <input type="text" name="dosage_ph" class="form-control" name="volumne" id="formGroupExampleInput2">
-                                    </div>
+                                      <label for="formGroupExampleInput2">Hardening Date </label>
+                                      <input type="date" class="form-control" name="hardening_date" id="formGroupExampleInput2">
+                                  </div>
                                 </div>
-                             
+                                <div class="form-row">
+                                  <div class="form-group col-md-12">
+                                      <label for="pesticide">Sapling Transplant Date </label>
+                                      <input type="date" name="sapling_transplant_date" class="form-control" name="volumne" id="pesticide">
+                                  </div>
+                                 
+                                </div>                             
+
                         </div>
                     </div>
 

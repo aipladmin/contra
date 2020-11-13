@@ -113,11 +113,25 @@ def germinationweekly():
 @admin.route('/germinationweekly_scr',methods=['POST'])
 def germinationweekly_scr():
     if request.method == "POST":
-        # period = request.form['period_of_time']
-        data_exists = mysql_query("select count(*),Period from days where GID={}".format(request.form['attempt_id']))
-        print(data_exists)
-        mysql_query("insert into days(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH) values({},'{}','{}','{}',{},{},{});"
-                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'] ) ) 
+
+          if 'weekly' in request.form:
+            mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
+                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
+            return redirect(url_for('admin.germinationweekly'))
+        if 'germination_desc' in request.form:
+            mysql_query('''INSERT INTO `contra`.`germination_detail`
+                        (`GID`,
+                        `Germination_Date`,
+                        `Average_Germination_Duration`,
+                        `Average_Time_of_True_Leaves`,
+                        `Average_Sapling_Height`,
+                        `Hardening_Cycle`,
+                        `Hardening_Date`,
+                        `Sapling_Transplant_Date`)
+                        VALUES
+                        ({},'{}',{},'{}',{},'{}','{}','{}'); '''.format(request.form['attempt_id'],request.form['date'],request.form['average_germination_duration'],request.form['average_time_of_true_leaves'],request.form['average_sapling_height'],request.form['hardening_cycle'],request.form['hardening_date'],request.form['sapling_transplant_date']))
+            return redirect(url_for('admin.germinationweekly'))
+
         return redirect(url_for('admin.germinationweekly'))
         
         # period = request.form['period_of_time']
@@ -129,5 +143,5 @@ def germinationweekly_scr():
 
 @admin.route('/sensordata')
 def sensordata():
-    data = mysql_query("select boards.Name,sensor_data.Humidity_Sensor,sensor_data.Sound_sensor,sensor_data.Temperature_Sensor,sensor_data.Ultrasonic_sensor,sensor_data.Timestamp as 'Log' from sensor_data inner join boards on boards.BID = sensor_data.BID;")
+    data = mysql_query("select boards.Name,sensor_data.Humidity_Sensor,sensor_data.Sound_sensor,sensor_data.Temperature_Sensor,sensor_data.Ultrasonic_sensor,sensor_data.Timestamp as 'Log' from sensor_data inner join boards on boards.BID = sensor_data.BID order by Timestamp desc;")
     return render_template("admin/sensordata.html",data=data)
