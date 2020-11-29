@@ -173,7 +173,6 @@ def germination_data():
             mysql_query("delete from germination_weekly where DID={}".format(request.form['delete']))
             flash("DID: "+str(request.form['delete'])+" Deleted","success")
             return redirect(url_for('admin.germination_data'))
-            
         if 'update' in request.form:
             mysql_query('''UPDATE `contra`.`germination_weekly`
                             SET
