@@ -170,8 +170,8 @@ def germination_data():
             # return redirect(url_for('admin.germination_data',gdata=gdata))
             return render_template('admin/germinationdata.html',data = data,gdata=gdata)
         if 'delete' in request.form:
-            mysql_query("delete from germination_weekly where DID={}".format(request.form['update']))
-            flash("DID: "+str(request.form['update'])+" Deleted","success")
+            mysql_query("delete from germination_weekly where DID={}".format(request.form['delete']))
+            flash("DID: "+str(request.form['delete'])+" Deleted","success")
             return redirect(url_for('admin.germination_data'))
         if 'update' in request.form:
             mysql_query('''UPDATE `contra`.`germination_weekly`

@@ -49,7 +49,7 @@
                 <td>{{ dt['Plant_Name'] }}</td>
                 <td>
                     <button type="button" class="btn btn-success" data-toggle="modal" 
-                    data-target="#{{ dt['Attempt_Name']~dt['Plant_Name']|replace(' ','') }}">
+                    data-target="#{{ dt['Attempt_Name'].strip()~dt['Plant_Name'].strip() }}">
                         <i class="fas fa-plus-circle"></i> Insert Data
                     </button>
                 </td>
