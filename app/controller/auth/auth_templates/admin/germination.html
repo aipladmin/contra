@@ -8,7 +8,25 @@
       <h1 class="h3 mb-0 text-gray-800">Germination</h1>
       <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
     </div>
-    
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          
+          {% for category, message in messages %}
+            {% if category.lower() == "success" %}
+            <div class="alert alert-success" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% endif %}
+          {% endfor %}
+          
+        {% endif %}
+      {% endwith %}
+    </div>
     <form method="POST" action="{{ url_for('admin.germination_scr') }}">
         <div class="form-row">
           <div class="form-group col-md-6">

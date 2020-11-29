@@ -8,6 +8,27 @@
       <h1 class="h3 mb-0 text-gray-800">Germination Weekly</h1>
       <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
     </div>
+
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          
+          {% for category, message in messages %}
+            {% if category.lower() == "success" %}
+            <div class="alert alert-success" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% endif %}
+          {% endfor %}
+          
+        {% endif %}
+      {% endwith %}
+    </div>
+
     <div class="table-responsive-sm">
         <table class="table">
             <thead class="thead-dark">
@@ -72,7 +93,7 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="formGroupExampleInput2">Time</label>
-                                        <input type="text" class="form-control" name="time" id="formGroupExampleInput2"  >
+                                        <input type="text" class="form-control" name="time" id="formGroupExampleInput2" required >
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="formGroupExampleInput2">Volume</label>
@@ -113,79 +134,7 @@
                   </div>
                 </div>
               </div>
-              <!-- AVERAGE GERMINATION DETAILS -->
-              <div class="modal" id="{{ dt['Attempt_Name'] }}">
-                <div class="modal-dialog modal-lg">
-                  <div class="modal-content">
-
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                      <h4 class="modal-title">Germination Data</h4>
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-
-                    <!-- Modal body -->
-                    <div class="modal-body">
-                        <div class="table-responsive">
-                           <form method="POST" action="{{ url_for('admin.germinationweekly_scr') }}">
-                                <div class="form-group">
-                                  <label for="formGroupExampleInput">Attempt ID</label>
-                                  <input type="text" class="form-control" name="attempt_id" readonly id="formGroupExampleInput" value="{{ dt['GID'] }}">
-                                </div>
-                                <div class="form-group">
-                                  <label for="formGroupExampleInput2">Germination Date</label>
-                                  <input type="date" class="form-control" name="date" id="formGroupExampleInput2" value="{{ dt['Curdate'] }}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="formGroupExampleInput2">Average Germination Duration</label>
-                                    <input type="text" class="form-control" name="average_germination_duration" id="formGroupExampleInput2">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="formGroupExampleInput2">Average time of true leaves</label>
-                                        <input type="time" class="form-control" name="average_time_of_true_leaves" id="formGroupExampleInput2" placeholder="Another input placeholder">
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                      <label for="formGroupExampleInput2">Average Sapling Height</label>
-                                      <input type="text" name="average_sapling_height" class="form-control" name="volumne" id="formGroupExampleInput2">
-                                  </div>
-                                    
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="formGroupExampleInput2">Hardening Cycle</label>
-                                        <select name="hardening_cycle"class="custom-select">
-                                          <option selected>Select Duration</option>
-                                          <option value="Hours">Hours</option>
-                                          <option value="Days">Days</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-md-6">
-                                      <label for="formGroupExampleInput2">Hardening Date </label>
-                                      <input type="date" class="form-control" name="hardening_date" id="formGroupExampleInput2">
-                                  </div>
-                                </div>
-                                <div class="form-row">
-                                  <div class="form-group col-md-12">
-                                      <label for="pesticide">Sapling Transplant Date </label>
-                                      <input type="date" name="sapling_transplant_date" class="form-control" name="volumne" id="pesticide">
-                                  </div>
-                                 
-                                </div>                             
-
-
-                        </div>
-                    </div>
-
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button type="button" name="weekly" class="btn btn-danger" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Submit </button>
-                    </div>
-                  </form>
-                  </div>
-                </div>
-              </div>
+              
               <!-- AVERAGE GERMINATION DETAILS -->
               <div class="modal" id="{{ dt['Attempt_Name'] }}">
                 <div class="modal-dialog modal-lg">

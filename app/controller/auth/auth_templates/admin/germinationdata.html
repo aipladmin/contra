@@ -1,0 +1,119 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+  <!-- {{ data }} -->
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Germination Data</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
+
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          
+          {% for category, message in messages %}
+            {% if category.lower() == "success" %}
+            <div class="alert alert-success" role="alert">
+              {{ category|title}} : {{ message }}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% endif %}
+          {% endfor %}
+          
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <form method="POST" action="{{  url_for('admin.germination_data') }}">
+        <div class="form-row">
+            <div class="col">
+            <select class="custom-select" name="GID">
+                
+                {% for items in data %}
+                    <option selected value="{{ items['GID'] }}">
+                        {{ items['Attempt_Name']|replace("_"," ") }} - {{ items['Plant_Name'] }} - {{ items['location'] }}
+                    </option>
+                {% endfor %}
+            </select>
+            </div>
+            <div class="col">
+            <input type="submit" name="submit" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+</div>
+<br/>
+{% if gdata is defined %}
+
+<div class="container-fluid">
+    <table class="table">
+  <thead class="thead-light">
+    <tr>
+    {% for items in gdata[0].keys() %}
+      <th> {{items}} </th>
+    {% endfor %}
+    <th> Update </th>
+    <th>Delete </th>
+    </tr>
+  </thead>
+  <tbody>
+   {%  for i in gdata %}
+   <form method="POST" action="{{ url_for('admin.germination_data') }}">
+    <tr>
+        <td>
+            {{ i['DID'] }}
+        </td>
+        <td>
+            {{ i['GID'] }}
+        </td>
+        <td>
+           <input type="date" value="{{ i['Date'] }}" name="date" class="form-control">
+        </td>
+        <td>
+            <input type="text" value="{{ i['Period'] }}" name="period" class="form-control">
+            
+        </td>
+        <td>
+            <input type="text" value="{{ i['Volume'] }}" name="volume" class="form-control">
+            
+        </td>
+         <td>
+             <input type="text" value="{{ i['Time'] }}" name="time" class="form-control">
+            
+        </td>
+         <td>
+            <input type="text" value="{{ i['Dosage_EC'] }}" name="dosage_ec" class="form-control">
+          
+        </td>
+        <td>
+             <input type="text" value="{{ i['Dosage_PH'] }}" name="dosage_ph" class="form-control">
+            
+        </td>
+        <td>
+             <input type="text" value="{{ i['Pesticide'] }}" name="pesticide" class="form-control">
+            
+        </td>
+        <td>
+             <input type="text" value="{{ i['Pesticide_Volume'] }}" name="pesticide_volume" class="form-control">
+            
+        </td>
+        <td>
+            <button type="submit"  value="{{ i['DID'] }}" name="update" class="btn btn-success">Update</button>
+        </td>
+        <td>
+            <button type="submit" value="{{ i['DID'] }}"  name="delete" class="btn btn-danger">Delete</button>
+        </td>
+
+   </tr>
+   </form>
+   {% endfor %}
+  </tbody>
+</table>
+</div>
+{%  endif %}
+{% endblock %}
