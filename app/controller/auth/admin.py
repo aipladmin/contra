@@ -129,6 +129,7 @@ def germinationweekly():
 def germinationweekly_scr():
     if request.method == "POST":
         if 'weekly' in request.form:
+
             try:
                 mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.
@@ -136,6 +137,7 @@ def germinationweekly_scr():
                 flash("Record Inserted","success")
             except Exception as e:
                 flash("Weekly: "+str(e),"error")
+
             return redirect(url_for('admin.germinationweekly'))
         if 'germination_desc' in request.form:
             try:
