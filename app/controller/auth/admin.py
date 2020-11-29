@@ -159,6 +159,40 @@ def germinationweekly_scr():
 
         return redirect(url_for('admin.germinationweekly'))
     
+@admin.route('/germination_data',methods=['GET','POST'])
+def germination_data():
+    if request.method == "POST":
+        if 'submit' in request.form:
+            gdata  = mysql_query('select * from germination_weekly where GID={}'.format(request.form['GID'] ))
+            data=mysql_query("select germination.GID,germination.Attempt_Name,germination.location,germination.Plant_Name from germination where GID={}".format(request.form['GID']))
+            # return redirect(url_for('admin.germination_data',gdata=gdata))
+            return render_template('admin/germinationdata.html',data = data,gdata=gdata)
+        if 'delete' in request.form:
+            mysql_query("delete from germination_weekly where DID={}".format(request.form['update']))
+            flash("DID: "+str(request.form['update'])+" Deleted","success")
+            return redirect(url_for('admin.germination_data'))
+        if 'update' in request.form:
+            mysql_query('''UPDATE `contra`.`germination_weekly`
+                            SET
+                            `Date` ='{}',
+                            `Period` ='{}',
+                            `Volume` ={} ,
+                            `Time` ={} ,
+                            `Dosage_EC` ={} ,
+                            `Dosage_PH` ={} ,
+                            `Pesticide` = {},
+                            `Pesticide_Volume` ={}
+                            WHERE `DID` ={}; '''.format(request.form['date'],request.form['period'],request.form['volume'],request.form['time'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'],request.form['update'] ))
+            flash("DID: "+str(request.form['update'])+" Updated","success")
+            return redirect(url_for('admin.germination_data'))
+        
+        return "POST"
+    
+    data=mysql_query("select germination.GID,germination.Attempt_Name,germination.location,germination.Plant_Name from germination")
+    print(data)
+    return render_template('admin/germinationdata.html',data=data)
+
+
 
 @admin.route('/sensordata')
 def sensordata():
