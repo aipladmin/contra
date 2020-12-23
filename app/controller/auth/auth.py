@@ -1,11 +1,12 @@
-from flask import Flask, render_template, Blueprint, request, g, session, redirect, url_for
+from flask import Flask, render_template, Blueprint, request, g, session, redirect, url_for, abort, jsonify
 # from passlib.hash import sha256_crypt
 from datetime import datetime, timedelta
 from functools import wraps
+from werkzeug.exceptions import HTTPException
 
 
 import sqlite3
-import random
+import random,json
 import string
 from ..sqlq import *
 
@@ -15,40 +16,22 @@ auth = Blueprint('auth',
                 static_folder="auth_static",
                 url_prefix='/')
 
-
-
 def password_generator(length):
     letters = string.ascii_lowercase
     rpassword = ''.join(random.choice(letters) for i in range(length))
     return rpassword
 
-
-# GLOBAL Before Request and after request
-# DO NOT TOUCH
-# @auth.before_app_request
-# def dbconn():
-# 	conn = sqlite3.connect('app.db')
-# 	g.db = conn
-
-
-# @auth.after_app_request
-# def closeconn(response):
-# 	if g.db is not None:
-# 		print('closing connection')
-# 		g.db.close()
-# 	return response
-
-# DECORATORS
-def login_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'email' in session and 'role' in session:
-            return f(*args, **kwargs)
-        else:
-            # flash('You need to login first')
-            return redirect(url_for('auth.login'))
-    return wrap
-
+@auth.app_errorhandler(HTTPException)
+def handle_exception(e):
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    })
+    response.content_type = "application/json"
+    return response
 
 @auth.route('/')
 def login():

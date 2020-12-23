@@ -1,4 +1,3 @@
-import sqlite3
 import random
 import string
 import sqlite3
@@ -43,48 +42,17 @@ def mysql_query(sql):
         return None
 
 
-    #     cursor.close()
-    #     connection.close()
-    #     return data
-    # else:
-    #     cursor.execute(sql,sqldt)
-    #     print(cursor._executed)
-    #     connection.commit()
-    #     cursor.close()
-    #     connection.close()
-    # return None
+    # DECORATORS
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'email' in session and 'role' in session:
+            return f(*args, **kwargs)
+        else:
+            # flash('You need to login first')
+            return redirect(url_for('auth.login'))
+    return wrap
 
-
-# def mysql_query(sql,sqldt):
-#     print(sql,sqldt)
-
-#     connection = mysql.connect()
-#     cursor = connection.cursor()
-#     if sql.split(' ')[0].lower() == "select" :
-#         if sqldt is None:
-#             cursor.execute(sql)
-#         else:
-#             cursor.execute(sql,sqldt)
-#             print(cursor._executed)
-        
-#         columns = [column[0] for column in cursor.description]
-#         results = []
-#         for row in cursor.fetchall():
-#             results.append(dict(zip(columns, row)))
-#         data = results
-#         # data = {'data':data}
-
-        
-#         cursor.close()
-#         connection.close()
-#         return data
-#     else:
-#         cursor.execute(sql,sqldt)
-#         print(cursor._executed)
-#         connection.commit()
-#         cursor.close()
-#         connection.close()
-#     return None
 
 def madhav():
     return 'madhav'

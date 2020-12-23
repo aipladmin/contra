@@ -8,6 +8,27 @@
       <h1 class="h3 mb-0 text-gray-800">Germination Weekly</h1>
       <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
     </div>
+
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          
+          {% for category, message in messages %}
+            {% if category.lower() == "success" %}
+            <div class="alert alert-success" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" role="alert">
+              {{ category }} {{ message }}
+            </div>
+            {% endif %}
+          {% endfor %}
+          
+        {% endif %}
+      {% endwith %}
+    </div>
+
     <div class="table-responsive-sm">
         <table class="table">
             <thead class="thead-dark">
@@ -28,7 +49,9 @@
                 <td>{{ dt['Plant_Name'] }}</td>
                 <td>
                     <button type="button" class="btn btn-success" data-toggle="modal" 
-                    data-target="#{{ dt['Attempt_Name']~dt['Plant_Name']|replace(' ','') }}">
+
+                    data-target="#{{ dt['Attempt_Name'].strip()~dt['Plant_Name'].strip() }}">
+
                         <i class="fas fa-plus-circle"></i> Insert Data
                     </button>
                 </td>
@@ -72,7 +95,9 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="formGroupExampleInput2">Time</label>
-                                        <input type="text" class="form-control" name="time" id="formGroupExampleInput2"  >
+
+                                        <input type="text" class="form-control" name="time" id="formGroupExampleInput2" required >
+
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="formGroupExampleInput2">Volume</label>
@@ -101,6 +126,8 @@
                                       <input type="text" name="pesticide_volume" class="form-control" name="volumne" id="pesticide_volume" value="0">
                                   </div>
                                 <!-- </div>                              -->
+<!-- <<<<<<< develop
+=======-->
                         </div>
                     </div>
 
@@ -174,18 +201,20 @@
                                 </div>                             
 
 
+<!-- >>>>>>> master --> -->
                         </div>
                     </div>
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
-                        <button type="button" name="weekly" class="btn btn-danger" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Submit </button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <button type="submit" name="weekly" class="btn btn-success">Submit </button>
                     </div>
                   </form>
                   </div>
                 </div>
               </div>
+              
               <!-- AVERAGE GERMINATION DETAILS -->
               <div class="modal" id="{{ dt['Attempt_Name'] }}">
                 <div class="modal-dialog modal-lg">

@@ -1,7 +1,7 @@
-from flask import Flask, render_template, Blueprint, request, g, session, redirect, url_for
-import secrets
+from flask import Flask, render_template, Blueprint, request, session, redirect, url_for, abort, jsonify,flash
+import secrets,json
 from werkzeug.datastructures import ImmutableMultiDict
-from werkzeug.exceptions import RequestEntityTooLarge
+from werkzeug.exceptions import HTTPException
 from ..sqlq import *
 
 admin = Blueprint('admin',
@@ -9,6 +9,18 @@ admin = Blueprint('admin',
                 template_folder="auth_templates",
                 static_folder="auth_static",
                 url_prefix='/admin')
+
+@admin.app_errorhandler(HTTPException)
+def handle_exception(e):
+    response = e.get_response()
+    # replace the body with JSON
+    response.data = json.dumps({
+        "code": e.code,
+        "name": e.name,
+        "description": e.description,
+    })
+    response.content_type = "application/json"
+    return response
 
 @admin.route('/')
 def index():
@@ -75,8 +87,9 @@ def germination():
 @admin.route('/germination_scr',methods=['POST'])
 def germination_scr():
     if request.method == "POST":
-            total = request.form['soakedseeds']+request.form['unsoakedseeds']
-            mysql_query('''INSERT INTO `contra`.`germination`
+            try:
+                total = int(request.form['soakedseeds'])+int(request.form['unsoakedseeds'])
+                mysql_query('''INSERT INTO `contra`.`germination`
                             (`Attempt_Name`,
                             `Location`,
                             `Plant_Name`,
@@ -98,7 +111,12 @@ def germination_scr():
                             request.form['Cocopeatecvalue'],request.form['waterph'],request.form['watertds'],request.form['sowingdate'],
                             request.form['growmedium'],request.form['lightsource'],request.form['seedcompany'],request.form['svariety'],
                             request.form['soakedseeds'],request.form['unsoakedseeds'],total,request.form['totalplants']))
-            return "post"
+                flash("Record(s) Inserted","success")
+            except Exception as e:
+                flash("Error: "+str(e),"failure")
+
+            return redirect(url_for('admin.germination'))
+            
 
     return "germination_scr"
 
@@ -111,12 +129,17 @@ def germinationweekly():
 def germinationweekly_scr():
     if request.method == "POST":
         if 'weekly' in request.form:
-
-            mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
-                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
+            try:
+                mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
+                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.
+                form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
+                flash("Record Inserted","success")
+            except Exception as e:
+                flash("Weekly: "+str(e),"error")
             return redirect(url_for('admin.germinationweekly'))
         if 'germination_desc' in request.form:
-            mysql_query('''INSERT INTO `contra`.`germination_detail`
+            try:
+                mysql_query('''INSERT INTO `contra`.`germination_detail`
                         (`GID`,
                         `Germination_Date`,
                         `Average_Germination_Duration`,
@@ -128,11 +151,50 @@ def germinationweekly_scr():
                         VALUES
 
                         ({},'{}',{},'{}',{},'{}','{}','{}'); '''.format(request.form['attempt_id'],request.form['date'],request.form['average_germination_duration'],request.form['average_time_of_true_leaves'],request.form['average_sapling_height'],request.form['hardening_cycle'],request.form['hardening_date'],request.form['sapling_transplant_date']))
+
+                flash("Record Inserted ","Success")
+            except Exception as e:
+                flash("Germination Data:"+str(e),"error")
+
             return redirect(url_for('admin.germinationweekly'))
 
 
         return redirect(url_for('admin.germinationweekly'))
     
+@admin.route('/germination_data',methods=['GET','POST'])
+def germination_data():
+    if request.method == "POST":
+        if 'submit' in request.form:
+            gdata  = mysql_query('select * from germination_weekly where GID={}'.format(request.form['GID'] ))
+            data=mysql_query("select germination.GID,germination.Attempt_Name,germination.location,germination.Plant_Name from germination where GID={}".format(request.form['GID']))
+            # return redirect(url_for('admin.germination_data',gdata=gdata))
+            return render_template('admin/germinationdata.html',data = data,gdata=gdata)
+        if 'delete' in request.form:
+            mysql_query("delete from germination_weekly where DID={}".format(request.form['delete']))
+            flash("DID: "+str(request.form['delete'])+" Deleted","success")
+            return redirect(url_for('admin.germination_data'))
+        if 'update' in request.form:
+            mysql_query('''UPDATE `contra`.`germination_weekly`
+                            SET
+                            `Date` ='{}',
+                            `Period` ='{}',
+                            `Volume` ={} ,
+                            `Time` ={} ,
+                            `Dosage_EC` ={} ,
+                            `Dosage_PH` ={} ,
+                            `Pesticide` = {},
+                            `Pesticide_Volume` ={}
+                            WHERE `DID` ={}; '''.format(request.form['date'],request.form['period'],request.form['volume'],request.form['time'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'],request.form['update'] ))
+            flash("DID: "+str(request.form['update'])+" Updated","success")
+            return redirect(url_for('admin.germination_data'))
+        
+        return "POST"
+    
+    data=mysql_query("select germination.GID,germination.Attempt_Name,germination.location,germination.Plant_Name from germination")
+    print(data)
+    return render_template('admin/germinationdata.html',data=data)
+
+
 
 @admin.route('/sensordata')
 def sensordata():
