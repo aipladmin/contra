@@ -1,0 +1,93 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+  <!-- {{ data }} -->
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Reports</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
+
+   
+    <form method="POST" action="{{  url_for('admin.reports') }}">
+        <div class="form-row">
+            <div class="col">
+            <select class="custom-select" name="GID">
+                
+                {% for items in data %}
+                    <option selected value="{{ items['GID'] }}">
+                        {{ items['Attempt_Name']|replace("_"," ") }} - {{ items['Plant_Name'] }} - {{ items['location'] }}
+                    </option>
+                {% endfor %}
+            </select>
+            </div>
+            <div class="col">
+            <input type="submit" name="submit" class="btn btn-success">
+            </div>
+        </div>
+    </form>
+</div>
+<br/>
+{% if gdata is defined %}
+
+<div class="container-fluid">
+    <table class="table">
+  <thead class="thead-light">
+    <tr>
+    {% for items in gdata[0].keys() %}
+      <th> {{items}} </th>
+    {% endfor %}
+    
+    </tr>
+  </thead>
+  <tbody>
+   {%  for i in gdata %}
+   <form method="POST" action="{{ url_for('admin.germination_data') }}">
+    <tr>
+        <td>
+            {{ i['DID'] }}
+        </td>
+        <td>
+            {{ i['GID'] }}
+        </td>
+        <td>
+           {{ i['Date'] }}
+        </td>
+        <td>
+            {{ i['Period'] }}
+            
+        </td>
+        <td>
+           {{ i['Volume'] }}
+            
+        </td>
+         <td>
+             {{ i['Time'] }}
+            
+        </td>
+         <td>
+           {{ i['Dosage_EC'] }}
+          
+        </td>
+        <td>
+            {{ i['Dosage_PH'] }}
+            
+        </td>
+        <td>
+             {{ i['Pesticide'] }}
+            
+        </td>
+        <td>
+             {{ i['Pesticide_Volume'] }}
+            
+        </td>
+       
+   </tr>
+   </form>
+   {% endfor %}
+  </tbody>
+</table>
+</div>
+{%  endif %}
+{% endblock %}
