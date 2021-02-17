@@ -35,6 +35,7 @@ def mysql_query(sql):
         print(sql)
         cursor.execute(sql)
         print(cursor._executed)
+        mysql_query.last_row_id = cursor.lastrowid
         
         connection.commit()
         cursor.close()
