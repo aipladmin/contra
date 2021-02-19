@@ -1,70 +1,224 @@
 {% extends 'index.html' %}
 {% block content %}
 
+<script>
+  var noc;
+  $(document).ready(function(){
+    $('#SF').hide();
+    $('#SS').hide();
+    $("input[name='method']").on('change',function(){
+      $.ajax({
+        data:{
+          Request_ID:"1",
+          method: $("input[name='method']:checked").val(),
+          pallete:$("#name").val()
+                },
+        type:'POST',
+        url:'/admin/PDAJAX'
+      }).done(function(result){
+        if(result.error)
+        {
+          alert("ERROR");
+        }
+        else{
+          var a;
+          a =result.result;
+          var ensopec = $('#enospec').val();
+          // console.log(a);
+          // console.log(enospec);
+          var ttl = parseInt(a)*parseInt(ensopec);
+          AJAXTotal = ttl;
+          console.log(result.result);
+          // $("#cavity").val(ttl).attr("readonly","true");
+          noc = result.result;
+          $('#helper_NOC').html(result.result);
+        }
+      });
+      event.preventDefault();
+    });
+    $("#seeds").on('change', function(){
+      $.ajax({
+        data:{
+          Request_ID:"2",
+          seeds:$("#seeds").val()
+        },
+        type: "POST",
+        url:'/admin/PDAJAX'
+      }).done(function(result){
+        if(result.error){alert("Error");}
+        else{
+          console.log("DATA");
+          var opts = $.parseJSON(JSON.stringify(result.result));
+          console.log(opts);
+          $('#manufacturer').empty();
+          $.each(opts, function(i, d) {
+                    
+                    console.log(d.Company_Name);
+                    $('#manufacturer').append('<option value="' + d.MID + '">' + d.Company_Name + '</option>');
+                });
+        }
+      });
+      event.preventDefault();
+    });
+     
+    $("#name").on('change', function(){
+      
+      $.ajax({
+        data:{
+          Request_ID:"3",
+          name:$("#name").val()
+        },
+        type: "POST",
+        url:'/admin/PDAJAX'
+      }).done(function(result){
+        if(result.error){alert("Error");}
+        else{
+          if(result.result == "0")
+          { 
+            console.log("o");
+            $('#SF').show();
+            
+          }
+          
+        }
+      });
+      event.preventDefault();
+    });
+  });
+</script>
+<script>
+  function calc(){
+    // console.log("keypress");
+    var noCheck = $('#noc').val();
+    remTotal = parseInt(noc)-parseInt(noCheck);
+    
+    if(remTotal <= 0)
+    {
+      console.log(remTotal);
+      document.getElementById("submit").disabled = true;
+    }
+    else{
+      document.getElementById("submit").disabled = false;
+    }
+  }
+</script>
+
+
 <div class="container-fluid">
-  <!-- {{ data }} -->
+
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
       <h1 class="h3 mb-0 text-gray-800">Palletes Data</h1>
       <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
 </div>
+
 <div class="container-fluid">
-<form>
-  <div class="form-group row">
-    <label for="staticEmail" class="col-sm-1 col-form-label">Select Pallete</label>
-    <div class="col-sm-5">
-      <select class="custom-select">
-        <option selected>Open this select menu</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
+<form method="post" action="{{ url_for('admin.palleteData') }}">
+   <div class="form-group row">
+      <label for="staticEmail" class="col-sm-1 col-form-label">Pallete Name</label>
+      <div class="col-lg-2 col-sm-4">
+        <select id="name" class="custom-select js-example-tags" name="pallete_name">
+          {% for x in Palletes_Name %}
+            <option value="{{ x['Pallete_Name'] }}">{{ x['Pallete_Name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-sm-5">
+       <div class="alert alert-success" role="alert" id="SS" style="display:none;">
+          Data Fecthed.
+        </div>
+        <div class="alert alert-danger" role="alert" id="SF" style="display:none;">
+          Not Available! Insert new Pallete.
+        </div>
+      </div>
     </div>
+  <!-- </div> -->
+
+  <div class="form-group row">
+    <label for="staticEmail" class="col-sm-1 col-form-label">Select Pallete Type</label>
+    <div class="col-sm-2">
+      <select id="pallete" class="custom-select" name="pallete_type">
+        <option selected>Pallete Menu</option>
+        {% for x in palletes %}
+          <option value="{{ x['CID'] }}">{{ x['Name'] }}</option>
+        {% endfor %}
+      </select>
+       </div>
+       <!-- <div class="col-sm-3">
+        <input type="text" id="enospec" placeholder="Enter No of Seeds Per Each Cavity" class="form-control">
+      </div>
+       <div class="col-sm-2">
+        <input type="text" class="form-control" id="cavity" readonly>
+      </div>
+      <div class="col-sm-2">
+        <button type="button" class="btn btn-success" id="fetchData">Calculate</button>
+      </div> -->
+      
+   
   </div>
+
+ 
+
   <div class="form-group row">
-    <label for="staticEmail" class="col-sm-1 col-form-label">Select Manufacturer</label>
-    <div class="col-sm-5">
-      <select class="custom-select">
-        <option selected>Open this select menu</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
-      </select>
-    </div>
+
      <label for="staticEmail" class="col-sm-1 col-form-label">Select Seeds</label>
     <div class="col-sm-5">
-      <select class="custom-select">
-        <option selected>Open this select menu</option>
-        <option value="1">One</option>
-        <option value="2">Two</option>
-        <option value="3">Three</option>
+      <select id="seeds" class="custom-select" name="seeds">
+        <option  selected>Seed Menu</option>
+        {% for x in seeds %}
+          <option value="{{ x['SEEDSID'] }}">{{ x['Seed_Name'] }}</option>
+        {% endfor %}
       </select>
     </div>
+
+    <label for="staticEmail" class="col-sm-1 col-form-label">Select Manufacturer</label>
+    <div class="col-sm-5">
+      <select id="manufacturer" class="custom-select" name="manufacturer">
+        <option selected>Open this select menu</option>
+        <!-- {% for x in manufacturers %}
+          <option value="{{ x['MID'] }}">{{ x['Company_Name'] }}</option>
+        {% endfor %} -->
+      </select>
     </div>
+   </div>
+
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="method" id="inlineRadio1" value="Sowing">
+      <label class="form-check-label" for="inlineRadio1">Sowing</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="method" id="inlineRadio2" value="Germination">
+      <label class="form-check-label" for="inlineRadio2">Germination</label>
+    </div>
+
+    <div class="form-group row">
+      <label for="staticEmail" class="col-sm-1 col-form-label">Date</label>
+      <div class="col-sm-5">
+          <input type="date" name="date" class="form-control" id="date">
+      </div>
+    </div>
+
     <div class="form-group row">
       <label for="staticEmail" class="col-sm-1 col-form-label">No of Cavity</label>
       <div class="col-sm-5">
-          <input type="text" class="form-control"  id="exampleCheck1">
+          <input type="text" class="form-control" name="noc" id="noc" onkeyup="calc();">
+           <small id="helper_NOC" class="form-text text-danger">
+            
+          </small>
       </div>
       <label for="staticEmail" class="col-sm-1 col-form-label">No of Seeds</label>
       <div class="col-sm-5">
-          <input type="text" class="form-control"  id="exampleCheck1">
+          <input type="text" class="form-control" name="nofs" id="nofs" >
           <small id="passwordHelpBlock" class="form-text text-muted">
             No. of Seeds in each Cavity.
           </small>
       </div>
     </div>
 
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-      <label class="form-check-label" for="inlineRadio1">Sowing</label>
-    </div>
-    <div class="form-check form-check-inline">
-      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-      <label class="form-check-label" for="inlineRadio2">Germination</label>
-    </div>
+   
     <br/><br>
-     <button class="btn btn-primary" type="submit">Submit</button>
+     <button id="submit" class="btn btn-primary" type="submit">Submit</button>
 </form>
 </div>
 {% endblock %}

@@ -227,10 +227,59 @@ def palletes():
             flash("Name Exist: "+e.str(),"danger")
             return redirect(url_for('admin.palletes'))
     return render_template('admin/palletes.html')
-
+####################################### PALLETE DATA       ####################
 @admin.route('/palleteData',methods=['GET','POST'])
 def palleteData():
-    return render_template('admin/palleteData.html')
+    if request.method =="POST":
+        MSID =  mysql_query("select * from Manufacturer_Seeds where MID={} and SEEDSID={};".format(request.form['manufacturer'],request.form['seeds']))
+        MSID = MSID[0]['MSID']
+        mysql_query('''INSERT INTO `contra`.`Pallete_Data`
+                        (`MSID`,
+                        `CID`,
+                        `Pallete_Name`,
+                        `Method`,
+                        `Date`,
+                        `PD_No_of_Cavity`,
+                        `PD_No_of_Seeds`)
+                        VALUES
+                        ({},{},'{}','{}','{}',{},{});'''.format(MSID,request.form['pallete_type'],request.form['pallete_name'],request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
+        return "render_template"
+    palletes = mysql_query("select * from cavities")
+    manufacturers = mysql_query("select * from Manufacturer_Master")
+    seeds = mysql_query("select * from seeds_master")
+    Palletes_Name=mysql_query("select Pallete_Name from Pallete_Data;")
+    return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name)
+
+@admin.route('/PDAJAX',methods=['POST'])
+def PDAJAX():
+    print("READING..........................")
+    if request.form['Request_ID'] == "1":
+        print(request.form['method'])
+        data = mysql_query(''' SELECT 
+                                cavities.No_of_Cavities - SUM(Pallete_Data.PD_No_of_Cavity) AS 'RemPart'
+                            FROM Pallete_Data INNER JOIN cavities ON cavities.CID = Pallete_Data.CID
+                            WHERE
+                                Pallete_Data.Pallete_Name = '{}' AND Pallete_Data.Method = '{}'
+                            GROUP BY Pallete_Name;'''.format(request.form['pallete'],request.form['method']))
+        if len(data) == 0:
+            return jsonify({"result":"50"})
+        else:
+            data = str(data[0]['RemPart'])
+            return jsonify({"result":data})
+    elif request.form['Request_ID'] == "2":
+        data = mysql_query("select Manufacturer_Master.MID,Manufacturer_Master.Company_Name  from Manufacturer_Master inner join Manufacturer_Seeds ON Manufacturer_Master.MID=Manufacturer_Seeds.MID where Manufacturer_Seeds.SEEDSID={}".format(request.form['seeds']))
+        # data = data[0]
+        print(data)
+        return jsonify({"result":data})
+    elif request.form['Request_ID'] == "3":
+        print(request.form['name'])
+        data = mysql_query("select * from Pallete_Data where Pallete_Name='{}' limit 1;".format(request.form['name']))
+        print(data)
+        if len(data) == 0:
+            return jsonify({"result":"0"})
+        else:
+            return jsonify({"result":data})
+####################################### PALLETE DATA       ####################
 
 @admin.route('/manufacturers',methods=['GET','POST'])
 def manufacturers():
@@ -266,6 +315,6 @@ def manufacturers():
         except Exception as e:
             flash("Error:"+str(e),"danger")
             return redirect(url_for('admin.manufacturers'))
-        return "reder"
+        
     data = mysql_query("select * from seeds_master")
     return render_template('admin/manufacturers.html',data=data)
