@@ -97,6 +97,3 @@ def logout():
     session.pop('role', None)
     
     return redirect(url_for('auth.login'))
-
-
-
