@@ -3,8 +3,6 @@ from flask import Flask, render_template, Blueprint, request, g, session, redire
 from datetime import datetime, timedelta
 from functools import wraps
 from werkzeug.exceptions import HTTPException
-
-
 import sqlite3
 import random,json
 import string
@@ -61,18 +59,6 @@ def loginscr():
 def index():
     return render_template('index.html')
 
-@auth.route('/test/')
-def test():
-    # admin = tuple()
-    # data = new_mysql_query(sql="update user_type_master SET Role='{}' where UTMID={} ".format('admin',1))
-
-    
-    
-    return "<h5>Test:</h5> <p>" + str(data) + "</p><p>"+str(data)+"</p>"
-
-
-
-
 # LOGOUT CODE
 @auth.route('/logout')
 @login_required
@@ -87,7 +73,3 @@ def index_template():
     return render_template('index.html')
 
 
-@auth.route('/prac')
-@login_required
-def prac():
-    return render_template('prac.htm.j2')
