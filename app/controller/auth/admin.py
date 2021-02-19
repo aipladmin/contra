@@ -23,10 +23,6 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
-@admin.route('/')
-def index():
-    return 'index'
-
 @admin.route('/boards')
 def boards():
     api_endpoint =request.host_url
@@ -38,6 +34,7 @@ def boards():
     return render_template('admin/boards.html',arduinoID = arduinoID,sensor_data=sensor_data,boards=boards,sensors=sensors)
 
 @admin.route('/boardscr',methods=['GET','POST'])
+@login_required
 def boardscr():
     if request.method == "POST":
         if "insert" in request.form:
@@ -64,6 +61,7 @@ def boardscr():
     return "data"
 
 @admin.route('/sensors',methods=['GET','POST'])
+@login_required
 def sensors():
     if request.method == 'POST':
         if 'insert_sensor' in request.form:
@@ -82,10 +80,12 @@ def sensors():
     return render_template('admin/sensors.html',data=data)
 
 @admin.route('/germination')
+@login_required
 def germination():
     return render_template('admin/germination.html')
 
 @admin.route('/germination_scr',methods=['POST'])
+@login_required
 def germination_scr():
     if request.method == "POST":
             try:
@@ -122,11 +122,13 @@ def germination_scr():
     return "germination_scr"
 
 @admin.route('/germinationweekly')
+@login_required
 def germinationweekly():
     data = mysql_query("select *,date(convert_tz(now(),'+00:00','+05:30')) as 'Curdate' from germination;")
     return render_template('admin/germinationlist.html',data=data)
 
 @admin.route('/germinationweekly_scr',methods=['POST'])
+@login_required
 def germinationweekly_scr():
     if request.method == "POST":
         if 'weekly' in request.form:
@@ -163,6 +165,7 @@ def germinationweekly_scr():
         return redirect(url_for('admin.germinationweekly'))
     
 @admin.route('/germination_data',methods=['GET','POST'])
+@login_required
 def germination_data():
     if request.method == "POST":
         if 'submit' in request.form:
@@ -198,11 +201,13 @@ def germination_data():
 
 
 @admin.route('/sensordata')
+@login_required
 def sensordata():
     data = mysql_query("select boards.Name,sensor_data.Humidity_Sensor,sensor_data.Sound_sensor,sensor_data.Temperature_Sensor,sensor_data.Ultrasonic_sensor,sensor_data.Timestamp as 'Log' from sensor_data inner join boards on boards.BID = sensor_data.BID order by Timestamp desc;")
     return render_template("admin/sensordata.html",data=data)
 
 @admin.route('/reports',methods=['GET','POST'])
+@login_required
 def reports():
     if request.method == "POST":
         gdata  = mysql_query('select * from germination_weekly where GID={}'.format(request.form['GID'] ))
@@ -215,6 +220,7 @@ def reports():
     return render_template('admin/reports.html',data=data)
 
 @admin.route('/palletes',methods=['GET','POST'])
+@login_required
 def palletes():
     if request.method =="POST":
         try:
@@ -229,6 +235,7 @@ def palletes():
     return render_template('admin/palletes.html')
 ####################################### PALLETE DATA       ####################
 @admin.route('/palleteData',methods=['GET','POST'])
+@login_required
 def palleteData():
     if request.method =="POST":
         MSID =  mysql_query("select * from Manufacturer_Seeds where MID={} and SEEDSID={};".format(request.form['manufacturer'],request.form['seeds']))
@@ -251,6 +258,7 @@ def palleteData():
     return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name)
 
 @admin.route('/PDAJAX',methods=['POST'])
+@login_required
 def PDAJAX():
     print("READING..........................")
     if request.form['Request_ID'] == "1":
@@ -282,6 +290,7 @@ def PDAJAX():
 ####################################### PALLETE DATA       ####################
 
 @admin.route('/manufacturers',methods=['GET','POST'])
+@login_required
 def manufacturers():
     if request.method == 'POST':
         try:
