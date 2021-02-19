@@ -20,16 +20,16 @@
                   </div>
                   <form class="user" action="{{ url_for('auth.loginscr') }}" method="POST">
                     <div class="form-group">
-                      <input type="email" name="emailid" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address...">
+                      <input type="email" name="emailid" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address" required>
                     </div>
                     <div class="form-group">
-                      <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" name="password">
+                      <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" name="password" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-user btn-block">
-                      Login
+                      Generate OTP
                     </button>
                     <hr>
-                    
+                     <div class="h6 float-right">Version: 1.5.18-20210219</div>
                   </form>
                   
                   
