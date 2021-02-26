@@ -23,10 +23,41 @@
       <input type="text" name="no_of_cavities" class="form-control" id="inputPassword">
     </div>
     <div class="col-sm-3">
-      <button type="submit" class="btn btn-success">Submit</button>
+      <button type="submit" class="btn btn-success" name="submit">Submit</button>
     </div>
   </div>
   
 </form>
+</div>
+<br/>
+<div class="container-fluid">
+  <table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Cavity</th>
+      <th scope="col">Update</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    {% for x in cavities %}
+    <form method="post" action="{{ url_for('admin.palletes') }}">
+    <tr>
+      <td>
+        <input type="text" name="name" value="{{ x['Name'] }}" class="form-control">
+        
+      </td>
+      <td>
+        <input type="text" name="noc" value="{{ x['No_of_Cavities'] }}" class="form-control">
+     </td>
+     <td>
+       <button type="submit" class="btn btn-primary" name="update" value="{{ x['CID']}}">Update</button>
+     </td>
+   </tr>
+   </form>
+   {% endfor %}
+  </tbody>
+</table>
 </div>
 {% endblock %}
