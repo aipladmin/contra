@@ -48,15 +48,8 @@ def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'email' in session:
-            global email
-            print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-            email = session['email']
             return f(*args, **kwargs)
         else:
-            AID = mysql_query("select AID from auth where Emailid='{}'".format(email))
-            AID = AID[0]['AID']
-            mysql_query("insert into Auth_Logs(AID,Method) values({},'{}')".format(AID,'ST'))
-            del email
             return redirect(url_for('auth.login'))
     return wrap
 
