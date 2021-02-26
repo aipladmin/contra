@@ -224,15 +224,26 @@ def reports():
 def palletes():
     if request.method =="POST":
         try:
-            mysql_query('''INSERT INTO `contra`.`cavities`
-                        (`Name`,`No_of_Cavities`)
-                        VALUES('{}',{})'''.format(request.form['name'],request.form['no_of_cavities']))
-            flash("Data Inserted","success")
-            return redirect(url_for('admin.palletes'))
+            if 'submit' in request.form:
+                mysql_query('''INSERT INTO `contra`.`cavities`
+                            (`Name`,`No_of_Cavities`)
+                            VALUES('{}',{})'''.format(request.form['name'],request.form['no_of_cavities']))
+                flash("Data Inserted.","success")
+                return redirect(url_for('admin.palletes'))
+            if 'update' in request.form:
+                mysql_query(''' UPDATE `contra`.`cavities`
+                                SET
+                                `Name` = '{}',
+                                `No_of_Cavities` = {}
+                                WHERE `CID` = {};
+                                '''.format(request.form['name'],request.form['noc'],request.form['update']))
+                flash("Data Updated.","success")
+                return redirect(url_for('admin.palletes'))
         except mysql.connector.IntegrityError as e:
             flash("Name Exist: "+e.str(),"danger")
             return redirect(url_for('admin.palletes'))
-    return render_template('admin/palletes.html')
+    palletes = mysql_query("select * from cavities")
+    return render_template('admin/palletes.html',cavities=palletes)
 ####################################### PALLETE DATA       ####################
 @admin.route('/palleteData',methods=['GET','POST'])
 @login_required
@@ -326,4 +337,12 @@ def manufacturers():
             return redirect(url_for('admin.manufacturers'))
         
     data = mysql_query("select * from seeds_master")
-    return render_template('admin/manufacturers.html',data=data)
+    mdata = mysql_query(''' SELECT 
+                ManCode, Company_Name, Purchase_Date, Expiry_Date, Seed_Name
+                FROM
+                Manufacturer_Seeds
+                    INNER JOIN
+                Manufacturer_Master ON Manufacturer_Master.MID = Manufacturer_Seeds.MID
+                    INNER JOIN
+                seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID; ''')
+    return render_template('admin/manufacturers.html',data=data,mdata=mdata)

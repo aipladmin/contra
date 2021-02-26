@@ -7,6 +7,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
       <h1 class="h3 mb-0 text-gray-800">Manufacturer</h1>
       <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
 </div>
 
 
@@ -67,11 +68,37 @@
       <input type="date" name="exp_date" class="form-control" id="inputPassword">
     </div>
   
-     <div class="col-sm-3">
+    
+    </div>
+    
       <button type="submit" class="btn btn-success">Submit</button>
-    </div>
-    </div>
-  </div>
+   
+ 
 </form>
+</div>
+<br/>
+<div class="container-fluid">
+  
+  <table class="table table-striped">
+  <thead class="thead-dark">
+    <tr>
+        {% for x in mdata[0].keys()|list %}
+          <th>{{ x.replace('_',' ') }}</th>
+        {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for x in mdata %}
+    <tr>
+      <th> {{ x['ManCode'] }} </th>
+      <td>{{ x['Company_Name'] }}</td>
+      <td>{{ x['Purchase_Date'].strftime('%d-%m-%Y') }}</td>
+       <td>{{ x['Expiry_Date'].strftime('%d-%m-%Y') }}</td>
+      <td>{{ x['Seed_Name'] }}</td>
+    </tr>
+    {% endfor %}
+   
+  </tbody>
+</table>
 </div>
 {% endblock %}
