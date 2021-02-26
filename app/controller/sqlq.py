@@ -48,9 +48,9 @@ def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'email' in session:
-            return f(*args, **kwargs)
+          return f(*args, **kwargs)
         else:
-            return redirect(url_for('auth.login'))
+          return redirect(url_for('auth.login'))
     return wrap
 
 def sql_query(sql, sqldt):
