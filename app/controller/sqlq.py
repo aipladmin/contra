@@ -50,6 +50,7 @@ def login_required(f):
         if 'email' in session and 'role' in session:
             return f(*args, **kwargs)
         return redirect(url_for('auth.login'))
+
     return wrap
 
 def sql_query(sql, sqldt):
