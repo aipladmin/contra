@@ -28,7 +28,7 @@
           // console.log(enospec);
           var ttl = parseInt(a)*parseInt(ensopec);
           AJAXTotal = ttl;
-          console.log(result.result);
+          // console.log(result.result);
           // $("#cavity").val(ttl).attr("readonly","true");
           noc = result.result;
           $('#helper_NOC').html(result.result);
@@ -47,9 +47,9 @@
       }).done(function(result){
         if(result.error){alert("Error");}
         else{
-          console.log("DATA");
+          // console.log("DATA");
           var opts = $.parseJSON(JSON.stringify(result.result));
-          console.log(opts);
+          // console.log(opts);
           $('#manufacturer').empty();
           $.each(opts, function(i, d) {
                     
@@ -77,8 +77,15 @@
           { 
             console.log("o");
             $('#SF').show();
-            
           }
+          else{
+            console.log(result.result[0]['Name']);
+            $('#pallete').find('option').remove().end().append('<option value="'+result.result[0]['CID']+'">'+result.result[0]['Name']+'</option').val(result.result[0]['CID']).attr('readonly',true);
+              // seeds manufacturer
+            $('#seeds').find('option').remove().end().append('<option value="'+result.result[0]['SEEDSID']+'">'+result.result[0]['seed_name']+'</option').val(result.result[0]['SEEDSID']).attr('readonly',true);
+
+            $('#manufacturer').find('option').remove().end().append('<option value="'+result.result[0]['MID']+'">'+result.result[0]['Company_Name']+'</option').val(result.result[0]['MID']);
+            }
           
         }
       });
@@ -92,7 +99,7 @@
     var noCheck = $('#noc').val();
     remTotal = parseInt(noc)-parseInt(noCheck);
     
-    if(remTotal <= 0)
+    if(remTotal < 0)
     {
       console.log(remTotal);
       document.getElementById("submit").disabled = true;
@@ -139,7 +146,7 @@
     <label for="staticEmail" class="col-sm-2 col-form-label">Select Pallete Type</label>
     <div class="col-sm-2">
       <select id="pallete" class="custom-select" name="pallete_type">
-        <option selected>Pallete Menu</option>
+        <option >Pallete Menu</option>
         {% for x in palletes %}
           <option value="{{ x['CID'] }}">{{ x['Name'] }}</option>
         {% endfor %}

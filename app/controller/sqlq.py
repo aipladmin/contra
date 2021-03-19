@@ -1,6 +1,4 @@
-import random
-import string
-import sqlite3
+import sqlite3,pdfkit
 # import email
 from flaskext.mysql import *
 from functools import wraps
@@ -15,6 +13,8 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'MiloniMadhav'
 app.config['MYSQL_DATABASE_DB'] = 'contra'
 app.config['MYSQL_DATABASE_HOST'] =  'contra.cjrbdmxkv84s.ap-south-1.rds.amazonaws.com'
 mysql.init_app(app)
+
+
 
 def mysql_query(sql):
     connection = mysql.connect()
@@ -47,10 +47,9 @@ def mysql_query(sql):
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'email' in session:
+        if 'email' in session and 'role' in session:
             return f(*args, **kwargs)
-        else:
-            return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login'))
     return wrap
 
 def sql_query(sql, sqldt):

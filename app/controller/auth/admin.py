@@ -1,15 +1,24 @@
 from flask import Flask, render_template, Blueprint, request, session, redirect, url_for, abort, jsonify,flash
-import secrets,json
+from datetime import datetime
+import secrets,json,pdfkit
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
 from datetime import datetime, timedelta
 from ..sqlq import *
+from .Data_Analysis import *
 
 admin = Blueprint('admin',
                 __name__,
                 template_folder="auth_templates",
                 static_folder="auth_static",
                 url_prefix='/admin')
+
+import platform
+if platform.system().lower() == "linux":
+    config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+elif platform.system().lower() == "windows":
+    config = pdfkit.configuration(wkhtmltopdf='C:\Program Files\wkhtmltopdf\\bin\wkhtmltopdf.exe')
+WKHTML_Config = config
 
 @admin.app_errorhandler(HTTPException)
 def handle_exception(e):
@@ -261,11 +270,12 @@ def palleteData():
                         `PD_No_of_Seeds`)
                         VALUES
                         ({},{},'{}','{}','{}',{},{});'''.format(MSID,request.form['pallete_type'],request.form['pallete_name'],request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
-        return "render_template"
+        flash('Data inserted','success')
+        return redirect(url_for('admin.palleteData'))
     palletes = mysql_query("select * from cavities")
     manufacturers = mysql_query("select * from Manufacturer_Master")
     seeds = mysql_query("select * from seeds_master")
-    Palletes_Name=mysql_query("select Pallete_Name from Pallete_Data;")
+    Palletes_Name=mysql_query("select distinct(Pallete_Name) from Pallete_Data;")
     return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name)
 
 @admin.route('/PDAJAX',methods=['POST'])
@@ -292,7 +302,23 @@ def PDAJAX():
         return jsonify({"result":data})
     elif request.form['Request_ID'] == "3":
         print(request.form['name'])
-        data = mysql_query("select * from Pallete_Data where Pallete_Name='{}' limit 1;".format(request.form['name']))
+        data = mysql_query(''' SELECT 
+                                cavities.CID,cavities.Name,
+                                seeds_master.SEEDSID,seeds_master.seed_name,
+                                Manufacturer_Master.MID,Manufacturer_Master.Company_Name
+                            FROM
+                                Pallete_Data
+                                    INNER JOIN
+                                cavities ON Pallete_Data.CID = cavities.CID
+                                    INNER JOIN
+                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Data.MSID
+                                    INNER JOIN
+                                Manufacturer_Master ON Manufacturer_Master.MID = Manufacturer_Seeds.MID
+                                INNER JOIN
+                                seeds_master ON seeds_master.SEEDSID= Manufacturer_Seeds.SEEDSID
+                            WHERE
+                                Pallete_Name = '{}'
+                            LIMIT 1; '''.format(request.form['name']))
         print(data)
         if len(data) == 0:
             return jsonify({"result":"0"})
@@ -345,4 +371,46 @@ def manufacturers():
                 Manufacturer_Master ON Manufacturer_Master.MID = Manufacturer_Seeds.MID
                     INNER JOIN
                 seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID; ''')
+    print(mdata)
     return render_template('admin/manufacturers.html',data=data,mdata=mdata)
+
+options = {
+        'page-size': 'A4',
+        'margin-top': '0.5in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.5in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'footer-left': "Contra Farms \nDeveloped by Wizards.",
+        'footer-font-size':'7',
+        'footer-right': '[page] of [topage]',
+        
+        'custom-header' : [
+            ('Accept-Encoding', 'gzip')
+        ],
+        'no-outline': None
+    }
+
+@admin.route('/viewallPallete')
+def palleteReports():
+    now = datetime.now()
+    # palleteData = mysql_query('select distinct(Pallete_Name) from Pallete_Data')
+    # data = mysql_query('''SELECT *,DATE_FORMAT(Date,'%d/%m/%y') AS 'SDATE' FROM
+    # Pallete_Data
+    #     INNER JOIN
+    # Manufacturer_Seeds ON Pallete_Data.MSID = Manufacturer_Seeds.MSID 
+	# INNER JOIN
+    # Manufacturer_Master ON Manufacturer_Seeds.MID=Manufacturer_Master.MID
+    #   INNER JOIN
+    # seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID;''')
+    
+    data = report1()
+
+    # rendered = render_template('admin/report_bones.html',data=data,now=now,palleteData=palleteData)
+    rendered = render_template('admin/reports_template.html',data=data,now=now,palleteData=palleteData)
+
+    pdf = pdfkit.from_string(rendered,False,configuration=WKHTML_Config,options=options)
+    response =make_response(pdf)
+    response.headers['Content-Type']='application/pdf'
+    response.headers['Content-Disposition']='inline'
+    return response

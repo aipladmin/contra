@@ -93,7 +93,8 @@ def index():
 def logout():
     AID = mysql_query("select AID from auth where Emailid='{}';".format(session['email']))
     mysql_query("insert into Auth_Logs(AID,Method) values({},'Logout')".format(AID[0]['AID']))
+
     session.pop('email', None)
     session.pop('role', None)
-    
+    # session.clear()
     return redirect(url_for('auth.login'))
