@@ -252,7 +252,7 @@ def palletes():
             flash("Name Exist: "+e.str(),"danger")
             return redirect(url_for('admin.palletes'))
     palletes = mysql_query("select * from cavities")
-    return render_template('admin/palletes.html',cavities=palletes)
+    return render_template('admin/GerminationTray.html',cavities=palletes)
 ####################################### PALLETE DATA       ####################
 @admin.route('/palleteData',methods=['GET','POST'])
 @login_required
