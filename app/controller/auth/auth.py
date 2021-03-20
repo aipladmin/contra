@@ -6,7 +6,7 @@ from werkzeug.exceptions import HTTPException
 import sqlite3
 import random,json
 import string
-from ..sqlq import *
+from ..controller import *
 
 auth = Blueprint('auth',
                 __name__,

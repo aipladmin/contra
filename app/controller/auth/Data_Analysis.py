@@ -1,5 +1,5 @@
 import pandas as pd
-from ..sqlq import *
+from ..controller import *
 
 def report1():
     data = mysql_query('''SELECT Pallete_Name,Date,Method,PD_No_of_Cavity,PD_No_of_Seeds,PD_No_of_Cavity * PD_No_of_Seeds as Total,'' as Remaining FROM

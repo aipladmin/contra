@@ -4,7 +4,7 @@ import secrets,json,pdfkit
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
 from datetime import datetime, timedelta
-from ..sqlq import *
+from ..controller import *
 from .Data_Analysis import *
 
 admin = Blueprint('admin',
