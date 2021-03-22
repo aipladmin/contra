@@ -80,10 +80,50 @@ def sensors():
     data = mysql_query("select * from sensor_master")
     return render_template('admin/sensors.html',data=data)
 
+
 @admin.route('/germination')
 def germination():
     return render_template('admin/germination.html')
 
+#! GERMINATION 
+####################################################GERMINATION SAPLING
+@admin.route('/germination_sapling')
+@login_required
+def germination_sapling():
+    data = mysql_query("select distinct(Pallete_Name) as 'PN' from Pallete_Data")
+    system = mysql_query("select * from Grow_System")
+    medium = mysql_query("select * from Grow_Medium")
+    return render_template('admin/germination_sapling.html',data=data,system=system,medium=medium)
+
+
+@admin.route('/germination/AJAX',methods=['GET','POST'])
+def germination_ajax():
+    if request.method == "POST":
+        # print(request.form)
+        if request.form['Request_ID'] == '1':
+            # print('inside')
+            data  =  mysql_query(''' SELECT 
+                                 Pallete_Data.Pallete_Name,
+                                seeds_master.Seed_Name,
+                                SUM(CASE
+                                    WHEN Pallete_Data.method = 'Sowing' THEN 0
+                                    WHEN Pallete_Data.method = 'Germination' THEN Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds
+                                    ELSE Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds * - 1
+                                END) AS 'Remaining'
+                            FROM
+                                Pallete_Data
+                                    INNER JOIN
+                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Data.MSID
+                                    INNER JOIN
+                                seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID
+                            WHERE Pallete_Data.Pallete_Name='{}'
+                            GROUP BY Pallete_Data.Pallete_Name; '''.format(request.form['pallete_name']))
+            print(data)
+            return jsonify({'result':data[0]})
+        return jsonify({'result':"NO Data"})
+
+
+####################################################GERMINATION SAPLING
 @admin.route('/germination_scr',methods=['POST'])
 def germination_scr():
     if request.method == "POST":
@@ -199,4 +239,235 @@ def germination_data():
 @admin.route('/sensordata')
 def sensordata():
     data = mysql_query("select boards.Name,sensor_data.Humidity_Sensor,sensor_data.Sound_sensor,sensor_data.Temperature_Sensor,sensor_data.Ultrasonic_sensor,sensor_data.Timestamp as 'Log' from sensor_data inner join boards on boards.BID = sensor_data.BID order by Timestamp desc;")
+
     return render_template("admin/sensordata.html",data=data)
+
+
+@admin.route('/reports',methods=['GET','POST'])
+@login_required
+def reports():
+    if request.method == "POST":
+        gdata  = mysql_query('select * from germination_weekly where GID={}'.format(request.form['GID'] ))
+        data=mysql_query("select germination.GID,germination.Attempt_Name,germination.location,germination.Plant_Name from germination where GID={}".format(request.form['GID']))
+            # return redirect(url_for('admin.germination_data',gdata=gdata))
+        return render_template('admin/reports.html',data = data,gdata=gdata)
+
+    data=mysql_query("select germination.GID,germination.Attempt_Name,germination.location,germination.Plant_Name from germination")
+    print(data)
+    return render_template('admin/reports.html',data=data)
+
+@admin.route('/palletes',methods=['GET','POST'])
+@login_required
+def palletes():
+    if request.method =="POST":
+        try:
+            if 'submit' in request.form:
+                mysql_query('''INSERT INTO `contra`.`cavities`
+                            (`Name`,`No_of_Cavities`)
+                            VALUES('{}',{})'''.format(request.form['name'],request.form['no_of_cavities']))
+                flash("Data Inserted.","success")
+                return redirect(url_for('admin.palletes'))
+            if 'update' in request.form:
+                mysql_query(''' UPDATE `contra`.`cavities`
+                                SET
+                                `Name` = '{}',
+                                `No_of_Cavities` = {}
+                                WHERE `CID` = {};
+                                '''.format(request.form['name'],request.form['noc'],request.form['update']))
+                flash("Data Updated.","success")
+                return redirect(url_for('admin.palletes'))
+        except mysql.connector.IntegrityError as e:
+            flash("Name Exist: "+e.str(),"danger")
+            return redirect(url_for('admin.palletes'))
+    palletes = mysql_query("select * from cavities")
+    return render_template('admin/GerminationTray.html',cavities=palletes)
+####################################### PALLETE DATA       ####################
+@admin.route('/palleteData',methods=['GET','POST'])
+@login_required
+def palleteData():
+    if request.method =="POST":
+        MSID =  mysql_query("select * from Manufacturer_Seeds where MID={} and SEEDSID={};".format(request.form['manufacturer'],request.form['seeds']))
+        MSID = MSID[0]['MSID']
+        
+        PMID = mysql_query("select PMID from Pallete_Master where Pallete_Name='{}'".format(request.form['pallete_name']))
+        print(PMID)
+        
+        print(len(PMID))
+        if len(PMID) == 0:
+            mysql_query(''' INSERT INTO `contra`.`Pallete_Master`
+                        (`CID`,
+                        `MSID`,
+                        `Pallete_Name`)
+                        VALUES
+                        ({},{},'{}');
+                        '''.format(request.form['pallete_type'],MSID,request.form['pallete_name']))
+            PMID=mysql_query.last_row_id
+
+            mysql_query('''INSERT INTO `contra`.`Pallete_Data`
+                            (`PMID`,
+                            `Method`,
+                            `Date`,
+                            `PD_No_of_Cavity`,
+                            `PD_No_of_Seeds`)
+                            VALUES
+                            ({},'{}','{}',{},{});'''.format(PMID,request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
+        else:
+            Earlier_PMID = PMID[0]['PMID']
+            mysql_query('''INSERT INTO `contra`.`Pallete_Data`
+                            (`PMID`,
+                            `Method`,
+                            `Date`,
+                            `PD_No_of_Cavity`,
+                            `PD_No_of_Seeds`)
+                            VALUES
+                            ({},'{}','{}',{},{});'''.format(Earlier_PMID,request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
+
+        flash('Data inserted','success')
+        return redirect(url_for('admin.palleteData'))
+    palletes = mysql_query("select * from cavities")
+    manufacturers = mysql_query("select * from Manufacturer_Master")
+    seeds = mysql_query("select * from seeds_master")
+    Palletes_Name=mysql_query("select distinct(Pallete_Name) from Pallete_Data;")
+    return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name)
+
+@admin.route('/PDAJAX',methods=['POST'])
+@login_required
+def PDAJAX():
+    print("READING..........................")
+    if request.form['Request_ID'] == "1":
+        print(request.form['method'])
+        data = mysql_query(''' SELECT 
+                                cavities.No_of_Cavities - SUM(Pallete_Data.PD_No_of_Cavity) AS 'RemPart'
+                            FROM Pallete_Data INNER JOIN Pallete_Master ON Pallete_Master.PMID=Pallete_Data.PMID Inner join cavities ON cavities.CID = Pallete_Master.CID
+                            WHERE
+                                Pallete_Master.Pallete_Name = '{}' AND Pallete_Data.Method = '{}'
+                            GROUP BY Pallete_Master.Pallete_Name;'''.format(request.form['pallete'],request.form['method']))
+        if len(data) == 0:
+            return jsonify({"result":"50"})
+        else:
+            data = str(data[0]['RemPart'])
+            return jsonify({"result":data})
+            
+    elif request.form['Request_ID'] == "2":
+        data = mysql_query("select Manufacturer_Master.MID,Manufacturer_Master.Company_Name  from Manufacturer_Master inner join Manufacturer_Seeds ON Manufacturer_Master.MID=Manufacturer_Seeds.MID where Manufacturer_Seeds.SEEDSID={}".format(request.form['seeds']))
+        # data = data[0]
+        print(data)
+        return jsonify({"result":data})
+    
+    elif request.form['Request_ID'] == "3":
+        print(request.form['name'])
+        data = mysql_query(''' SELECT 
+                                cavities.CID,cavities.Name,
+                                seeds_master.SEEDSID,seeds_master.seed_name,
+                                Manufacturer_Master.MID,Manufacturer_Master.Company_Name
+                            FROM
+                                Pallete_Data
+                                INNER join
+                                Pallete_Master  on Pallete_Master.PMID = Pallete_Data.PMID
+                                    INNER JOIN
+                                cavities ON Pallete_Master.CID = cavities.CID
+                                    INNER JOIN
+                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Master.MSID
+                                    INNER JOIN
+                                Manufacturer_Master ON Manufacturer_Master.MID = Manufacturer_Seeds.MID
+                                INNER JOIN
+                                seeds_master ON seeds_master.SEEDSID= Manufacturer_Seeds.SEEDSID
+                            WHERE
+                                Pallete_Master.Pallete_Name = '{}'
+                            LIMIT 1; '''.format(request.form['name']))
+        
+        if len(data) == 0:
+            return jsonify({"result":"0"})
+        else:
+            return jsonify({"result":data})
+####################################### PALLETE DATA       ####################
+
+@admin.route('/manufacturers',methods=['GET','POST'])
+@login_required
+def manufacturers():
+    if request.method == 'POST':
+        try:
+
+            pur_date = datetime.strptime(request.form['pur_date'],"%Y-%m-%d")
+            exp_date = datetime.strptime(request.form['exp_date'],"%Y-%m-%d")
+            purdate = pur_date.strftime('%d%m')
+            exp_date =exp_date.strftime('%d%m')
+            
+            com_name=request.form['company_name'][:3].strip()
+            seeds = mysql_query("select Seed_Name from seeds_master where SEEDSID='{}';".format(request.form['seedsid']))
+            seeds = seeds[0]['Seed_Name'][:3].strip()
+            ManuCode = com_name+"/"+seeds+"/"+purdate+"/"+exp_date
+            ManCode = ManuCode.upper()
+
+            mysql_query('''INSERT INTO `contra`.`Manufacturer_Master`
+                        (`ManCode`,
+                        `Company_Name`,
+                        `No_of_Seeds`,
+                        `Variety`,
+                        `Purchase_Date`,
+                        `Expiry_Date`,
+                        `Weight`,
+                        `Price`)
+                        VALUES
+                        ('{}','{}',{},'{}','{}','{}',{},{})'''.format(ManCode,request.form['company_name'],request.form['no_of_seeds'],request.form['variety'],request.form['pur_date'],request.form['exp_date'],request.form['weight'],request.form['price']))
+            MID =  mysql_query.last_row_id
+            mysql_query("insert into Manufacturer_Seeds(MID,SEEDSID) values({},{});".format(MID,request.form['seedsid']))
+            flash("Records Inserted.","success")
+            return redirect(url_for('admin.manufacturers'))
+        except Exception as e:
+            flash("Error:"+str(e),"danger")
+            return redirect(url_for('admin.manufacturers'))
+        
+    data = mysql_query("select * from seeds_master")
+    mdata = mysql_query(''' SELECT 
+                ManCode, Company_Name, Purchase_Date, Expiry_Date, Seed_Name
+                FROM
+                Manufacturer_Seeds
+                    INNER JOIN
+                Manufacturer_Master ON Manufacturer_Master.MID = Manufacturer_Seeds.MID
+                    INNER JOIN
+                seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID; ''')
+    print(mdata)
+    return render_template('admin/manufacturers.html',data=data,mdata=mdata)
+
+options = {
+        'page-size': 'A4',
+        'margin-top': '0.5in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.5in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'footer-left': "Contra Farms \nDeveloped by Wizards.",
+        'footer-font-size':'7',
+        'footer-right': '[page] of [topage]',
+        
+        'custom-header' : [
+            ('Accept-Encoding', 'gzip')
+        ],
+        'no-outline': None
+    }
+
+@admin.route('/viewallPallete')
+def palleteReports():
+    now = datetime.now()
+    # palleteData = mysql_query('select distinct(Pallete_Name) from Pallete_Data')
+    # data = mysql_query('''SELECT *,DATE_FORMAT(Date,'%d/%m/%y') AS 'SDATE' FROM
+    # Pallete_Data
+    #     INNER JOIN
+    # Manufacturer_Seeds ON Pallete_Data.MSID = Manufacturer_Seeds.MSID 
+	# INNER JOIN
+    # Manufacturer_Master ON Manufacturer_Seeds.MID=Manufacturer_Master.MID
+    #   INNER JOIN
+    # seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID;''')
+    
+    data = report1()
+
+    # rendered = render_template('admin/report_bones.html',data=data,now=now,palleteData=palleteData)
+    rendered = render_template('admin/reports_template.html',data=data,now=now,palleteData=palleteData)
+
+    pdf = pdfkit.from_string(rendered,False,configuration=WKHTML_Config,options=options)
+    response =make_response(pdf)
+    response.headers['Content-Type']='application/pdf'
+    response.headers['Content-Disposition']='inline'
+    return response
+
