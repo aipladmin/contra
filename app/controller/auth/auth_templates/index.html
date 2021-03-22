@@ -45,7 +45,8 @@
             <h6 class="collapse-header">Custom Components:</h6>
             <a class="collapse-item" href="{{ url_for('admin.boards') }}">Boards</a>
             <a class="collapse-item" href="{{ url_for('admin.sensors') }}">Sensors</a>
-            <a class="collapse-item" href="cards.html">Cards</a>
+            <a class="collapse-item" href="{{ url_for('admin.palletes') }}">Palletes</a>
+            <a class="collapse-item" href="{{ url_for('admin.manufacturers') }}">Manufacturer</a>
           </div>
         </div>
       </li>
@@ -79,7 +80,28 @@
       <hr class="sidebar-divider">
       
       <div class="sidebar-heading">
-        Sensor Data
+         Reports
+      </div>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#reports" aria-expanded="true" aria-controls="reports">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>Reports</span>
+        </a>
+        <div id="reports" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">&nbsp;</h6>
+            <a class="collapse-item" href="{{ url_for('admin.reports') }}">View Reports </a>
+            <!-- <h6 class="collapse-header">&nbsp;</h6> -->
+            <a class="collapse-item" href="{{ url_for('admin.palleteReports') }}">
+              Pallete Reports </a>
+          </div>
+        </div>
+       
+      </li>
+
+      <hr class="sidebar-divider">
+      <div class="sidebar-heading">
+        View Sensor Data
       </div>
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#sensordata" aria-expanded="true" aria-controls="sensordata">
@@ -90,6 +112,26 @@
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Custom Components:</h6>
             <a class="collapse-item" href="{{ url_for('admin.sensordata') }}">Sensor Data </a>
+            
+          </div>
+        </div>
+      </li>
+      
+      
+      <hr class="sidebar-divider">
+      
+      <div class="sidebar-heading">
+        Palette Information
+      </div>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#palletedata" aria-expanded="true" aria-controls="sensordata">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>Palletes</span>
+        </a>
+        <div id="palletedata" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">Custom Components:</h6>
+            <a class="collapse-item" href="{{ url_for('admin.palleteData') }}">Pallete Data </a>
             
           </div>
         </div>

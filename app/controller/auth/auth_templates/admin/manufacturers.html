@@ -1,0 +1,105 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+  <!-- {{ data }} -->
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Seeds Manufacturer</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+    </div>
+</div>
+
+
+{% include 'admin/notifications.html' %}
+
+<div class="container-fluid">
+<form method="POST" action="{{ url_for('admin.manufacturers') }}">
+  <div class="form-group row">
+    <label for="staticEmail" class="col-sm-1 col-form-label">Company Name</label>
+    <div class="col-sm-3">
+      <input type="text" name="company_name" class="form-control" >
+    </div>
+     <label for="inputPassword" class="col-sm-1 col-form-label">Seed Name</label>
+    <div class="col-sm-3">
+      <select name="seedsid" class="custom-select">
+        <option selected>Open this select menu</option>
+        {% for x in data %}
+        <option value="{{ x['SEEDSID'] }}">{{ x['Seed_Name'] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    
+    <label for="inputPassword" class="col-sm-1 col-form-label">No of seeds</label>
+    <div class="col-sm-3">
+      <input type="text" name="no_of_seeds" class="form-control" id="inputPassword">
+    </div>
+    
+    <label for="inputPassword" class="col-sm-1 col-form-label">Variety</label>
+    <div class="col-sm-3">
+      <input type="text" name="variety" class="form-control" id="inputPassword">
+    </div>
+  </div>
+  <div class="form-group row">
+   
+    <label for="inputPassword" class="col-sm-1 col-form-label">Weight</label>
+    <div class="col-sm-3">
+      <input type="text" name="weight" class="form-control" id="inputPassword">
+      
+    </div>
+     <label for="inputPassword" class="col-sm-1 col-form-label">Price</label>
+    <div class="col-sm-3">
+      <input type="text" name="price" class="form-control" id="inputPassword">
+      
+    </div>
+    
+  </div>
+   <div class="form-group row">
+      <label for="inputPassword" class="col-sm-1 col-form-label">Purchase Date</label>
+      <div class="col-sm-3">
+        <input type="date" name="pur_date" class="form-control" id="inputPassword">
+      </div>
+
+    <label for="inputPassword" class="col-sm-1 col-form-label">Expiry Date</label>
+    <div class="col-sm-3">
+      <input type="date" name="exp_date" class="form-control" id="inputPassword">
+    </div>
+  
+    
+    </div>
+    
+      <button type="submit" class="btn btn-success">Submit</button>
+   
+ 
+</form>
+</div>
+<br/>
+
+<div class="container-fluid">
+  
+  <table class="table table-striped">
+  <thead class="thead-dark">
+    <tr>
+        {% for x in mdata[0].keys()|list %}
+          <th>{{ x.replace('_',' ') }}</th>
+        {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for x in mdata %}
+    <tr>
+      <th> {{ x['ManCode'] }} </th>
+      <td>{{ x['Company_Name'] }}</td>
+      <td>{{ x['Purchase_Date'].strftime('%d-%m-%Y') }}</td>
+       <td>{{ x['Expiry_Date'].strftime('%d-%m-%Y') }}</td>
+      <td>{{ x['Seed_Name'] }}</td>
+    </tr>
+    {% endfor %}
+   
+  </tbody>
+</table>
+</div>
+{% endblock %}

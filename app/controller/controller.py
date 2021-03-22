@@ -1,7 +1,5 @@
-import random
-import string
-import sqlite3
-
+import sqlite3,pdfkit
+# import email
 from flaskext.mysql import *
 from functools import wraps
 from flask_mail import Mail,Message
@@ -15,6 +13,8 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'MiloniMadhav'
 app.config['MYSQL_DATABASE_DB'] = 'contra'
 app.config['MYSQL_DATABASE_HOST'] =  'contra.cjrbdmxkv84s.ap-south-1.rds.amazonaws.com'
 mysql.init_app(app)
+
+
 
 def mysql_query(sql):
     connection = mysql.connect()
@@ -36,6 +36,7 @@ def mysql_query(sql):
         print(sql)
         cursor.execute(sql)
         print(cursor._executed)
+        mysql_query.last_row_id = cursor.lastrowid
         
         connection.commit()
         cursor.close()
@@ -43,21 +44,15 @@ def mysql_query(sql):
         return None
 
 
-    # DECORATORS
+# DECORATORS
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
         if 'email' in session and 'role' in session:
             return f(*args, **kwargs)
-        else:
-            # flash('You need to login first')
-            return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login'))
+
     return wrap
-
-
-def madhav():
-    return 'madhav'
-
 
 def sql_query(sql, sqldt):
     # print("SQLDT:"+sqldt)
@@ -93,3 +88,16 @@ def sql_query(sql, sqldt):
         else:
             con.close()
             return rows
+
+# MAIL DRIVER
+def send_mail(**deets):
+    mail = Mail()
+        # with current_app.app_context():
+    #     mail = Mail()
+    #     mail.send(msg)
+    # print(deets['otp'])
+    msg = Message(deets['Subject'], sender = 'developer.websupp@gmail.com', recipients = [deets['Emailid'] ])
+    # print(msg)
+    msg.html = render_template('mail.html',emailid=deets['Emailid'],otp=deets['OTP'],salutation = deets['salutation'])
+    mail.send(msg)
+    return "mail"

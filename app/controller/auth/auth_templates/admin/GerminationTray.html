@@ -1,0 +1,63 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="container-fluid">
+  <!-- {{ data }} -->
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Germination Tray</h1>
+      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
+</div>
+
+{% include 'admin/notifications.html' %}
+
+<div class="container-fluid">
+<form method="POST" action="{{ url_for('admin.palletes') }}">
+  <div class="form-group row">
+    <label for="staticEmail" class="col-sm-1 col-form-label">Name</label>
+    <div class="col-sm-3">
+      <input type="text" name="name" class="form-control" >
+    </div>
+     <label for="inputPassword" class="col-sm-1 col-form-label">Nos. Cavities</label>
+    <div class="col-sm-3">
+      <input type="text" name="no_of_cavities" class="form-control" id="inputPassword">
+    </div>
+    <div class="col-sm-3">
+      <button type="submit" class="btn btn-success" name="submit">Submit</button>
+    </div>
+  </div>
+  
+</form>
+</div>
+<br/>
+<div class="container-fluid">
+  <table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Cavity</th>
+      <th scope="col">Update</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    {% for x in cavities %}
+    <form method="post" action="{{ url_for('admin.palletes') }}">
+    <tr>
+      <td>
+        <input type="text" name="name" value="{{ x['Name'] }}" class="form-control">
+        
+      </td>
+      <td>
+        <input type="text" name="noc" value="{{ x['No_of_Cavities'] }}" class="form-control">
+     </td>
+     <td>
+       <button type="submit" class="btn btn-primary" name="update" value="{{ x['CID']}}">Update</button>
+     </td>
+   </tr>
+   </form>
+   {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

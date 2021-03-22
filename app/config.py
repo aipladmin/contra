@@ -1,15 +1,10 @@
 import decimal,flask.json
 from datetime import datetime,timedelta
-
 from flask import g,sessions,json
-
-
 import flask.json
 import secrets
 
 
-# basedir = os.path.abspath(os.path.dirname(__file__))
-# print(basedir)
 class Config(object):
     TESTING = True
     DEBUG = True

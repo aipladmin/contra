@@ -1,14 +1,24 @@
 from flask import Flask, render_template, Blueprint, request, session, redirect, url_for, abort, jsonify,flash
-import secrets,json
+from datetime import datetime
+import secrets,json,pdfkit
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
-from ..sqlq import *
+from datetime import datetime, timedelta
+from ..controller import *
+from .Data_Analysis import *
 
 admin = Blueprint('admin',
                 __name__,
                 template_folder="auth_templates",
                 static_folder="auth_static",
                 url_prefix='/admin')
+
+import platform
+if platform.system().lower() == "linux":
+    config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+elif platform.system().lower() == "windows":
+    config = pdfkit.configuration(wkhtmltopdf='C:\Program Files\wkhtmltopdf\\bin\wkhtmltopdf.exe')
+WKHTML_Config = config
 
 @admin.app_errorhandler(HTTPException)
 def handle_exception(e):
@@ -22,10 +32,6 @@ def handle_exception(e):
     response.content_type = "application/json"
     return response
 
-@admin.route('/')
-def index():
-    return 'index'
-
 @admin.route('/boards')
 def boards():
     api_endpoint =request.host_url
@@ -37,6 +43,7 @@ def boards():
     return render_template('admin/boards.html',arduinoID = arduinoID,sensor_data=sensor_data,boards=boards,sensors=sensors)
 
 @admin.route('/boardscr',methods=['GET','POST'])
+@login_required
 def boardscr():
     if request.method == "POST":
         if "insert" in request.form:
@@ -63,6 +70,7 @@ def boardscr():
     return "data"
 
 @admin.route('/sensors',methods=['GET','POST'])
+@login_required
 def sensors():
     if request.method == 'POST':
         if 'insert_sensor' in request.form:
@@ -82,6 +90,7 @@ def sensors():
 
 
 @admin.route('/germination')
+@login_required
 def germination():
     return render_template('admin/germination.html')
 
@@ -125,6 +134,7 @@ def germination_ajax():
 
 ####################################################GERMINATION SAPLING
 @admin.route('/germination_scr',methods=['POST'])
+@login_required
 def germination_scr():
     if request.method == "POST":
             try:
@@ -161,15 +171,16 @@ def germination_scr():
     return "germination_scr"
 
 @admin.route('/germinationweekly')
+@login_required
 def germinationweekly():
     data = mysql_query("select *,date(convert_tz(now(),'+00:00','+05:30')) as 'Curdate' from germination;")
     return render_template('admin/germinationlist.html',data=data)
 
 @admin.route('/germinationweekly_scr',methods=['POST'])
+@login_required
 def germinationweekly_scr():
     if request.method == "POST":
         if 'weekly' in request.form:
-
             try:
                 mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
                 .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.
@@ -177,7 +188,6 @@ def germinationweekly_scr():
                 flash("Record Inserted","success")
             except Exception as e:
                 flash("Weekly: "+str(e),"error")
-
             return redirect(url_for('admin.germinationweekly'))
         if 'germination_desc' in request.form:
             try:
@@ -193,15 +203,18 @@ def germinationweekly_scr():
                         VALUES
 
                         ({},'{}',{},'{}',{},'{}','{}','{}'); '''.format(request.form['attempt_id'],request.form['date'],request.form['average_germination_duration'],request.form['average_time_of_true_leaves'],request.form['average_sapling_height'],request.form['hardening_cycle'],request.form['hardening_date'],request.form['sapling_transplant_date']))
+
                 flash("Record Inserted ","Success")
             except Exception as e:
                 flash("Germination Data:"+str(e),"error")
+
             return redirect(url_for('admin.germinationweekly'))
 
 
         return redirect(url_for('admin.germinationweekly'))
     
 @admin.route('/germination_data',methods=['GET','POST'])
+@login_required
 def germination_data():
     if request.method == "POST":
         if 'submit' in request.form:
@@ -237,11 +250,10 @@ def germination_data():
 
 
 @admin.route('/sensordata')
+@login_required
 def sensordata():
     data = mysql_query("select boards.Name,sensor_data.Humidity_Sensor,sensor_data.Sound_sensor,sensor_data.Temperature_Sensor,sensor_data.Ultrasonic_sensor,sensor_data.Timestamp as 'Log' from sensor_data inner join boards on boards.BID = sensor_data.BID order by Timestamp desc;")
-
     return render_template("admin/sensordata.html",data=data)
-
 
 @admin.route('/reports',methods=['GET','POST'])
 @login_required
@@ -322,6 +334,7 @@ def palleteData():
                             VALUES
                             ({},'{}','{}',{},{});'''.format(Earlier_PMID,request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
 
+
         flash('Data inserted','success')
         return redirect(url_for('admin.palleteData'))
     palletes = mysql_query("select * from cavities")
@@ -342,18 +355,19 @@ def PDAJAX():
                             WHERE
                                 Pallete_Master.Pallete_Name = '{}' AND Pallete_Data.Method = '{}'
                             GROUP BY Pallete_Master.Pallete_Name;'''.format(request.form['pallete'],request.form['method']))
+
         if len(data) == 0:
             return jsonify({"result":"50"})
         else:
             data = str(data[0]['RemPart'])
             return jsonify({"result":data})
-            
+
     elif request.form['Request_ID'] == "2":
         data = mysql_query("select Manufacturer_Master.MID,Manufacturer_Master.Company_Name  from Manufacturer_Master inner join Manufacturer_Seeds ON Manufacturer_Master.MID=Manufacturer_Seeds.MID where Manufacturer_Seeds.SEEDSID={}".format(request.form['seeds']))
         # data = data[0]
         print(data)
         return jsonify({"result":data})
-    
+
     elif request.form['Request_ID'] == "3":
         print(request.form['name'])
         data = mysql_query(''' SELECT 
@@ -376,6 +390,7 @@ def PDAJAX():
                                 Pallete_Master.Pallete_Name = '{}'
                             LIMIT 1; '''.format(request.form['name']))
         
+
         if len(data) == 0:
             return jsonify({"result":"0"})
         else:
@@ -470,4 +485,3 @@ def palleteReports():
     response.headers['Content-Type']='application/pdf'
     response.headers['Content-Disposition']='inline'
     return response
-

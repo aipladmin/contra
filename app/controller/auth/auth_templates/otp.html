@@ -16,22 +16,21 @@
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Contra</h1>
+                    <h1 class="h4 text-gray-900 mb-4">OTP</h1>
                   </div>
-                  <form class="user" action="{{ url_for('auth.loginscr') }}" method="POST">
+                  <form class="user" action="{{ url_for('auth.otp') }}" method="POST">
                     <div class="form-group">
-                      <input type="email" name="emailid" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address" required>
+                      <input type="password" name="otp" class="form-control form-control-user" id="exampleInputEmail" placeholder="Enter OTP" onkeypress="return isNumberKey(event)" required>
+                      <small id="passwordHelpBlock" class="form-text text-danger">
+                        Check your Registered Email-ID for OTP.
+                      </small>
                     </div>
-                    <div class="form-group">
-                      <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" name="password" required>
-                    </div>
+                    
                     <button type="submit" class="btn btn-primary btn-user btn-block">
-                      Generate OTP
+                      Login
                     </button>
                     <hr>
-
-                     <div class="h6 float-right">Version: 1.5.22-20210226</div>
-
+                    
                   </form>
                   
                   
@@ -40,10 +39,17 @@
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
-
   </div>
+
+      <script>
+        function isNumberKey(evt){
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        }    
+</script>
+
   {% include 'footer.html' %}
