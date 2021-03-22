@@ -88,11 +88,51 @@ def sensors():
     data = mysql_query("select * from sensor_master")
     return render_template('admin/sensors.html',data=data)
 
+
 @admin.route('/germination')
 @login_required
 def germination():
     return render_template('admin/germination.html')
 
+#! GERMINATION 
+####################################################GERMINATION SAPLING
+@admin.route('/germination_sapling')
+@login_required
+def germination_sapling():
+    data = mysql_query("select distinct(Pallete_Name) as 'PN' from Pallete_Data")
+    system = mysql_query("select * from Grow_System")
+    medium = mysql_query("select * from Grow_Medium")
+    return render_template('admin/germination_sapling.html',data=data,system=system,medium=medium)
+
+
+@admin.route('/germination/AJAX',methods=['GET','POST'])
+def germination_ajax():
+    if request.method == "POST":
+        # print(request.form)
+        if request.form['Request_ID'] == '1':
+            # print('inside')
+            data  =  mysql_query(''' SELECT 
+                                 Pallete_Data.Pallete_Name,
+                                seeds_master.Seed_Name,
+                                SUM(CASE
+                                    WHEN Pallete_Data.method = 'Sowing' THEN 0
+                                    WHEN Pallete_Data.method = 'Germination' THEN Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds
+                                    ELSE Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds * - 1
+                                END) AS 'Remaining'
+                            FROM
+                                Pallete_Data
+                                    INNER JOIN
+                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Data.MSID
+                                    INNER JOIN
+                                seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID
+                            WHERE Pallete_Data.Pallete_Name='{}'
+                            GROUP BY Pallete_Data.Pallete_Name; '''.format(request.form['pallete_name']))
+            print(data)
+            return jsonify({'result':data[0]})
+        return jsonify({'result':"NO Data"})
+
+
+####################################################GERMINATION SAPLING
 @admin.route('/germination_scr',methods=['POST'])
 @login_required
 def germination_scr():
@@ -260,16 +300,41 @@ def palleteData():
     if request.method =="POST":
         MSID =  mysql_query("select * from Manufacturer_Seeds where MID={} and SEEDSID={};".format(request.form['manufacturer'],request.form['seeds']))
         MSID = MSID[0]['MSID']
-        mysql_query('''INSERT INTO `contra`.`Pallete_Data`
-                        (`MSID`,
-                        `CID`,
-                        `Pallete_Name`,
-                        `Method`,
-                        `Date`,
-                        `PD_No_of_Cavity`,
-                        `PD_No_of_Seeds`)
+        
+        PMID = mysql_query("select PMID from Pallete_Master where Pallete_Name='{}'".format(request.form['pallete_name']))
+        print(PMID)
+        
+        print(len(PMID))
+        if len(PMID) == 0:
+            mysql_query(''' INSERT INTO `contra`.`Pallete_Master`
+                        (`CID`,
+                        `MSID`,
+                        `Pallete_Name`)
                         VALUES
-                        ({},{},'{}','{}','{}',{},{});'''.format(MSID,request.form['pallete_type'],request.form['pallete_name'],request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
+                        ({},{},'{}');
+                        '''.format(request.form['pallete_type'],MSID,request.form['pallete_name']))
+            PMID=mysql_query.last_row_id
+
+            mysql_query('''INSERT INTO `contra`.`Pallete_Data`
+                            (`PMID`,
+                            `Method`,
+                            `Date`,
+                            `PD_No_of_Cavity`,
+                            `PD_No_of_Seeds`)
+                            VALUES
+                            ({},'{}','{}',{},{});'''.format(PMID,request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
+        else:
+            Earlier_PMID = PMID[0]['PMID']
+            mysql_query('''INSERT INTO `contra`.`Pallete_Data`
+                            (`PMID`,
+                            `Method`,
+                            `Date`,
+                            `PD_No_of_Cavity`,
+                            `PD_No_of_Seeds`)
+                            VALUES
+                            ({},'{}','{}',{},{});'''.format(Earlier_PMID,request.form['method'],request.form['date'],request.form['noc'],request.form['nofs']))
+
+
         flash('Data inserted','success')
         return redirect(url_for('admin.palleteData'))
     palletes = mysql_query("select * from cavities")
@@ -286,20 +351,23 @@ def PDAJAX():
         print(request.form['method'])
         data = mysql_query(''' SELECT 
                                 cavities.No_of_Cavities - SUM(Pallete_Data.PD_No_of_Cavity) AS 'RemPart'
-                            FROM Pallete_Data INNER JOIN cavities ON cavities.CID = Pallete_Data.CID
+                            FROM Pallete_Data INNER JOIN Pallete_Master ON Pallete_Master.PMID=Pallete_Data.PMID Inner join cavities ON cavities.CID = Pallete_Master.CID
                             WHERE
-                                Pallete_Data.Pallete_Name = '{}' AND Pallete_Data.Method = '{}'
-                            GROUP BY Pallete_Name;'''.format(request.form['pallete'],request.form['method']))
+                                Pallete_Master.Pallete_Name = '{}' AND Pallete_Data.Method = '{}'
+                            GROUP BY Pallete_Master.Pallete_Name;'''.format(request.form['pallete'],request.form['method']))
+
         if len(data) == 0:
             return jsonify({"result":"50"})
         else:
             data = str(data[0]['RemPart'])
             return jsonify({"result":data})
+
     elif request.form['Request_ID'] == "2":
         data = mysql_query("select Manufacturer_Master.MID,Manufacturer_Master.Company_Name  from Manufacturer_Master inner join Manufacturer_Seeds ON Manufacturer_Master.MID=Manufacturer_Seeds.MID where Manufacturer_Seeds.SEEDSID={}".format(request.form['seeds']))
         # data = data[0]
         print(data)
         return jsonify({"result":data})
+
     elif request.form['Request_ID'] == "3":
         print(request.form['name'])
         data = mysql_query(''' SELECT 
@@ -308,18 +376,21 @@ def PDAJAX():
                                 Manufacturer_Master.MID,Manufacturer_Master.Company_Name
                             FROM
                                 Pallete_Data
+                                INNER join
+                                Pallete_Master  on Pallete_Master.PMID = Pallete_Data.PMID
                                     INNER JOIN
-                                cavities ON Pallete_Data.CID = cavities.CID
+                                cavities ON Pallete_Master.CID = cavities.CID
                                     INNER JOIN
-                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Data.MSID
+                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Master.MSID
                                     INNER JOIN
                                 Manufacturer_Master ON Manufacturer_Master.MID = Manufacturer_Seeds.MID
                                 INNER JOIN
                                 seeds_master ON seeds_master.SEEDSID= Manufacturer_Seeds.SEEDSID
                             WHERE
-                                Pallete_Name = '{}'
+                                Pallete_Master.Pallete_Name = '{}'
                             LIMIT 1; '''.format(request.form['name']))
-        print(data)
+        
+
         if len(data) == 0:
             return jsonify({"result":"0"})
         else:

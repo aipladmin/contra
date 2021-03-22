@@ -20,6 +20,7 @@ def mysql_query(sql):
     connection = mysql.connect()
     cursor = connection.cursor()
     if sql.strip().split(' ')[0].lower() == "select" :
+        print(sql)
         cursor.execute(sql)
         print(cursor._executed)
         
