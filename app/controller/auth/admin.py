@@ -100,8 +100,9 @@ def germination():
 @login_required
 def germination_sapling():
     if request.method =="POST":
-        if 'submit' in request.form:
-            try:
+        
+        try:
+            if 'submit' in request.form:
                 print(request.form)
                 PMID = mysql_query("Select PMID from Pallete_Master where Pallete_Name='{}';".format(request.form['pallete_name']))
                 # print(PMID[0]['PMID'])
@@ -128,12 +129,16 @@ def germination_sapling():
                                     VALUES
                                     ({},{},'{}','{}',{});
                                     '''.format(PMID,GCNID,request.form['netpod'],request.form['description'],request.form['quantity']))
-            except Exception as e:
-                print(traceback.format_exc())
-                return "ERROR"
-            else:
-                flash("Records Inserted","success")
+            if 'final_submit' in request.form:
+                mysql_query("UPDATE `contra`.`Grow_Channel` SET `Flag` = 'UPD';")
+                flash("Records Stored and Freezed.","success")
                 return redirect(url_for('admin.germination_sapling'))
+        except Exception as e:
+            print(traceback.format_exc())
+            return "ERROR"
+        else:
+            flash("Records Inserted","success")
+            return redirect(url_for('admin.germination_sapling'))
     data = mysql_query("select distinct(Pallete_Name) as 'PN' from Pallete_Data")
     system = mysql_query("select * from Grow_System")
     medium = mysql_query("select * from Grow_Medium")
