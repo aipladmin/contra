@@ -3,7 +3,7 @@ import secrets
 import sys
 from werkzeug import exceptions
 from werkzeug.datastructures import ImmutableMultiDict
-from ..sqlq import *
+from ..controller import *
 
 api = Blueprint('api',
                 __name__,

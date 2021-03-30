@@ -3,7 +3,7 @@ import sqlite3
 from flask import Flask
 from flask_mail import Mail
 from flaskext.mysql import MySQL
-
+import decimal,flask.json
 from .config import Config
 
 def create_app():
@@ -15,7 +15,8 @@ def create_app():
     # app.config.from_pyfile('config.py')
 
     app.config.from_object(Config)
-
+ 
+    app.json_encoder = Config.MyJSONEncoder
     
 
     # mysql = MySQL()
