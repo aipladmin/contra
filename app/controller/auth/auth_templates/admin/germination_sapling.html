@@ -3,6 +3,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
     $("#FD").hide();
+    $("#AddButton").hide();
     $("#SeedName").hide();
     $("#Remaining").hide();
     $("#pallete_nameID").on('change', function(){
@@ -27,6 +28,7 @@ $(document).ready(function() {
                     $("#SeedName").val(result.result.Seed_Name).attr("readonly",true);
                     $("#Remaining").show();
                     $("#Remaining").val(result.result.Remaining).attr("readonly",true);
+                    $("#AddButton").show();
             }
         });
         event.preventDefault();
@@ -39,9 +41,12 @@ $(document).ready(function() {
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
       <h1 class="h3 mb-0 text-gray-800">Germination Sapling</h1>
-      <!-- <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus fa-sm "></i> Add Sensors</button> -->
-</div>
+     </div>
+
+     {% include 'admin/notifications.html' %}
+
 <div class="container-fluid">
+    <form method="POST" action="{{ url_for('admin.germination_sapling')}}">
     <div class="row">
         <div class="col-sm-3 pb-2">
             <select class="custom-select" name="pallete_name" id="pallete_nameID">
@@ -64,11 +69,13 @@ $(document).ready(function() {
             </div>
     </div>
 </div>
+
 <div class="container-fluid">
-    <button type="button" class="btn btn-primary btn-block col-sm-1" data-toggle="modal" data-target="#AddData">Add</button>
+    <button type="button" class="btn btn-primary btn-block col-sm-1" data-toggle="modal" data-target="#AddData" id="AddButton">Add</button>
 </div>
+
 <div class="modal fade" id="AddData" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Add Sapling</h5>
@@ -81,13 +88,26 @@ $(document).ready(function() {
                 <div class="form-group row">
                     <label for="inputPassword" class="col-sm-2 col-form-label">Pallete Name</label>
                     <div class="col-sm-10">
-                    <input type="text" class="form-control" id="input_Pallete">
+                    <input type="text" class="form-control" name="pallete_name" id="input_Pallete">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="input_system" class="col-sm-2 col-form-label">Channel Name</label>
+                    <div class="col-sm-10">
+                         <select class="custom-select custom-select js-example-tags" name="channel_name" id="channel_nameID" style="width:100% !important">
+                            <option value="0">Select Channel Name</option>
+                            {% for x in channel_name %}
+                                <option value="{{ x['Grow_Channel_Name'] }}">
+                                    {{ x['Grow_Channel_Name'] }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                  <div class="form-group row">
                     <label for="input_system" class="col-sm-2 col-form-label">System Name</label>
                     <div class="col-sm-10">
-                         <select class="custom-select" name="pallete_name" id="system_nameID">
+                         <select class="custom-select" name="system_name" id="system_nameID">
                             <option value="0">Select Systems</option>
                             {% for x in system %}
                                 <option value="{{ x['GSID'] }}">
@@ -100,8 +120,8 @@ $(document).ready(function() {
                 <div class="form-group row">
                     <label for="mediumID" class="col-sm-2 col-form-label">Medium</label>
                     <div class="col-sm-10">
-                         <select class="custom-select" name="pallete_name" id="mediumID">
-                            <option value="0">Select Systems</option>
+                         <select class="custom-select" name="medium" id="mediumID">
+                            <option value="0">Select Medium</option>
                             {% for x in medium %}
                                 <option value="{{ x['GMID'] }}">
                                     {{ x['Medium_Name'] }}
@@ -110,14 +130,73 @@ $(document).ready(function() {
                         </select>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label for="input_system" class="col-sm-2 col-form-label">Netpod</label>
+                    <div class="col-sm-10">
+                        <select class="custom-select" name="netpod" id="mediumID">
+                            <option value="0">Select Netpod</option>
+                            <option value="None">None</option>
+                            <option value="Small">Small</option>
+                            <option value="Big">Big</option>
+                        </select>
+                    </div>
+                </div>
+                 <div class="form-group row">
+                    <label for="input_system" class="col-sm-2 col-form-label">Description</label>
+                    <div class="col-sm-10">
+                       <input type="text" class="form-control" name="description" placeholder="Description">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="input_system" class="col-sm-2 col-form-label">Quantity</label>
+                    <div class="col-sm-10">
+                       <input type="text" class="form-control" name="quantity" placeholder="Quantity" value="0" required>
+                    </div>
+                </div>
             </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="submit" id="submitID" name="submit" class="btn btn-primary">Save Changes</button>
+        
       </div>
+    </form>
     </div>
   </div>
+</div>
+<br/>
+<div class="container-fluid">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+            <th scope="col">Pallete Name</th>
+            <th scope="col">Grow Channel</th>
+            <th scope="col">Grow System</th>
+            <!-- <th scope="col">Update</th>
+            <th scope="col">Delete</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for x in Inserted_data %}
+                <tr>
+                    <td>
+                      {{ x['Pallete_Name'] }}
+                    </td>
+                     <td>
+                      {{ x['Medium_Name'] }}
+                    </td>
+                    <td>
+                        {{ x['System_Name'] }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    <div class="container-fluid">
+        <form method="POST" action="{{ url_for('admin.germination_sapling')}}">
+            <button type="submit" name="final_submit" class="btn btn-success float-right mr-5">Save</button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

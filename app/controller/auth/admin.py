@@ -1,6 +1,6 @@
 from flask import Flask, render_template, Blueprint, request, session, redirect, url_for, abort, jsonify,flash
 from datetime import datetime
-import secrets,json,pdfkit
+import secrets,json,pdfkit,traceback
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
 from datetime import datetime, timedelta
@@ -96,13 +96,69 @@ def germination():
 
 #! GERMINATION 
 ####################################################GERMINATION SAPLING
-@admin.route('/germination_sapling')
+@admin.route('/germination_sapling',methods=['GET','POST'])
 @login_required
 def germination_sapling():
+    if request.method =="POST":
+        
+        try:
+            if 'submit' in request.form:
+                print(request.form)
+                PMID = mysql_query("Select PMID from Pallete_Master where Pallete_Name='{}';".format(request.form['pallete_name']))
+                # print(PMID[0]['PMID'])
+                PMID = PMID[0]['PMID']
+                
+                GCNID = mysql_query("select GCNID from Grow_Channel_Name where Grow_Channel_Name='{}';".format(request.form['channel_name']))
+                print(GCNID)
+                
+                if GCNID == []:
+                    
+                    mysql_query("INSERT iNTO Grow_Channel_Name(GMID,GSID,Grow_Channel_Name) values({},{},'{}')".format(
+                        request.form['medium'],request.form['system_name'],request.form['channel_name']))
+                    GCNID = mysql_query.last_row_id
+                    print(GCNID)
+                else:
+                    GCNID = GCNID[0]['GCNID']
+                print("#"*100)
+                mysql_query(''' INSERT INTO `contra`.`Grow_Channel`
+                                    (PMID,
+                                    GCNID,
+                                    `Netpod`,
+                                    `Description`,
+                                    `Quantity`)
+                                    VALUES
+                                    ({},{},'{}','{}',{});
+                                    '''.format(PMID,GCNID,request.form['netpod'],request.form['description'],request.form['quantity']))
+            if 'final_submit' in request.form:
+                mysql_query("UPDATE `contra`.`Grow_Channel` SET `Flag` = 'UPD';")
+                flash("Records Stored and Freezed.","success")
+                return redirect(url_for('admin.germination_sapling'))
+        except Exception as e:
+            print(traceback.format_exc())
+            return "ERROR"
+        else:
+            flash("Records Inserted","success")
+            return redirect(url_for('admin.germination_sapling'))
     data = mysql_query("select distinct(Pallete_Name) as 'PN' from Pallete_Data")
     system = mysql_query("select * from Grow_System")
     medium = mysql_query("select * from Grow_Medium")
-    return render_template('admin/germination_sapling.html',data=data,system=system,medium=medium)
+    channel_name = mysql_query("select * from Grow_Channel_Name")
+    Inserted_data = mysql_query(''' 
+                                SELECT 
+                                *
+                            FROM
+                                Grow_Channel
+                                    INNER JOIN
+                                Grow_Channel_Name ON Grow_Channel_Name.GCNID = Grow_Channel.GCNID
+                                    INNER JOIN
+                                Grow_System ON Grow_System.GSID = Grow_Channel_Name.GSID
+                                    INNER JOIN
+                                Grow_Medium ON Grow_Medium.GMID = Grow_Channel_Name.GMID
+                                    INNER JOIN
+                                Pallete_Master ON Pallete_Master.PMID = Grow_Channel.PMID
+                            WHERE
+                                Flag = 'INS'; ''')
+    return render_template('admin/germination_sapling.html',data=data,system=system,medium=medium,channel_name=channel_name,Inserted_data=Inserted_data)
 
 
 @admin.route('/germination/AJAX',methods=['GET','POST'])
@@ -110,23 +166,26 @@ def germination_ajax():
     if request.method == "POST":
         # print(request.form)
         if request.form['Request_ID'] == '1':
-            # print('inside')
-            data  =  mysql_query(''' SELECT 
-                                 Pallete_Data.Pallete_Name,
-                                seeds_master.Seed_Name,
-                                SUM(CASE
-                                    WHEN Pallete_Data.method = 'Sowing' THEN 0
-                                    WHEN Pallete_Data.method = 'Germination' THEN Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds
-                                    ELSE Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds * - 1
-                                END) AS 'Remaining'
-                            FROM
-                                Pallete_Data
-                                    INNER JOIN
-                                Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Data.MSID
-                                    INNER JOIN
-                                seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID
-                            WHERE Pallete_Data.Pallete_Name='{}'
-                            GROUP BY Pallete_Data.Pallete_Name; '''.format(request.form['pallete_name']))
+            print(request.form)
+            data  =  mysql_query('''SELECT 
+                                    Pallete_Master.Pallete_Name,
+                                    seeds_master.Seed_Name,
+                                    SUM(CASE
+                                        WHEN Pallete_Data.method = 'Sowing' THEN 0
+                                        WHEN Pallete_Data.method = 'Germination' THEN Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds
+                                        ELSE Pallete_Data.PD_No_of_Cavity * Pallete_Data.PD_No_of_Seeds * - 1
+                                    END) AS 'Remaining'
+                                FROM
+                                    Pallete_Data
+                                        INNER JOIN
+                                    Pallete_Master ON Pallete_Master.PMID = Pallete_Data.PMID
+                                        INNER JOIN
+                                    Manufacturer_Seeds ON Manufacturer_Seeds.MSID = Pallete_Master.MSID
+                                        INNER JOIN
+                                    seeds_master ON seeds_master.SEEDSID = Manufacturer_Seeds.SEEDSID
+                                WHERE
+                                    Pallete_Master.Pallete_Name = '{}'
+                                GROUP BY Pallete_Master.Pallete_Name; '''.format(request.form['pallete_name']))
             print(data)
             return jsonify({'result':data[0]})
         return jsonify({'result':"NO Data"})
