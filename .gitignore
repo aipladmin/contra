@@ -176,3 +176,6 @@ instance/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+New_Report.ipynb
+*.ipynb
+*.csv
