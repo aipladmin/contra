@@ -552,6 +552,6 @@ def sowingReports():
 
 @admin.route('/Reports')
 def Reports():
-    data = RepoDashboard()
+    data,plot_histo = RepoDashboard()
     
-    return render_template('admin/Reports/Reports.html',data_html = data)
+    return render_template('admin/Reports/Reports.html',data_html = data,plot_histo=plot_histo)
