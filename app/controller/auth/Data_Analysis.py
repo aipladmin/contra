@@ -81,16 +81,10 @@ def RepoDashboard():
     
     dct = {}
     disData = mysql_query("SELECT distinct(Pallete_Name) as 'PN' from Pallete_Master;")
-    # print(disData[0]['PN'])
-    # disData=disData[0]
+    
     
     for x in disData:
-        print(x['PN'])
-        #     print(x[0])
-        # data = pd.read_sql_query(
-        #     '''
-        #     SELECT Pallete_Master.Pallete_Name,Pallete_Data.Method,Pallete_Data.PD_No_of_Cavity*Pallete_Data.PD_No_of_Seeds AS 'Total Seeds' from Pallete_Data inner join Pallete_Master ON Pallete_Data.PMID=Pallete_Master.PMID where Pallete_Master.Pallete_Name='{}';
-        # '''.format(str(x[0])), conn)
+        
         data = mysql_query(" SELECT Pallete_Master.Pallete_Name,Pallete_Data.Method,Pallete_Data.PD_No_of_Cavity*Pallete_Data.PD_No_of_Seeds AS 'Total Seeds' from Pallete_Data inner join Pallete_Master ON Pallete_Data.PMID=Pallete_Master.PMID where Pallete_Master.Pallete_Name='{}';".format(str(x['PN'])))
         
         data = pd.DataFrame(data)
