@@ -11,17 +11,30 @@
 
 <div class="container-fluid">
     <div class="row">
-    {% for x,v in data_html.items() %}
-  <div class="col-sm-3 pb-5">
-  <div class="card">
-        <h5 class="card-header">Board Analysis</h5>
-        <div class="card-body">
-        <h5 class="card-title">{{ x }}</h5>
-        <p class="card-text">{{ v|safe }}</p>
-        <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+        <div class="col-sm-12 pb-5">
+        <div class="card">
+                <h5 class="card-header">Comparitive Board Analysis</h5>
+                <div class="card-body">
+                <h5 class="card-title">&nbsp;</h5>
+                <p class="card-text">{{ plot_histo|safe }}</p>
+                <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
         </div>
     </div>
-    </div>
+    
+    <div class="row">
+    {% for x,v in data_html.items() %}
+    <div class="col-sm-3 pb-5">
+        <div class="card">
+                <h5 class="card-header">Board Analysis</h5>
+                <div class="card-body">
+                <h5 class="card-title">{{ x }}</h5>
+                <p class="card-text">{{ v|safe }}</p>
+                <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
     {% endfor %}
     </div>
 </div>

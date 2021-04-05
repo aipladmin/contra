@@ -94,5 +94,13 @@ def RepoDashboard():
         fig.to_html(full_html=False,include_plotlyjs=False)
         dct.__setitem__(str(x['PN']),fig.to_html(full_html=False))
     print("END")
-    # print(dct)
-    return dct
+    
+    data = mysql_query(
+    '''
+    SELECT Pallete_Master.Pallete_Name,Pallete_Data.Method,Pallete_Data.PD_No_of_Cavity*Pallete_Data.PD_No_of_Seeds AS 'Total Seeds' from Pallete_Data inner join Pallete_Master ON Pallete_Data.PMID=Pallete_Master.PMID;
+    ''')
+    df = data
+    # data.groupby(['Pallete_Name','Method']).sum().plot(kind='pie', subplots=True, shadow = True,startangle=90,figsize=(7,7))
+    fig = px.bar(df, x="Pallete_Name", y="Total Seeds",color="Method", title="Pallete Wise Distribution")
+    plot_histo = fig.to_html(full_html=False,include_plotlyjs=False)
+    return dct,plot_histo
