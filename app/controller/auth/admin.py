@@ -544,3 +544,14 @@ def palleteReports():
     response.headers['Content-Type']='application/pdf'
     response.headers['Content-Disposition']='inline'
     return response
+
+@admin.route('/sowingReports')
+def sowingReports():
+    data = report2()
+    return render_template('admin/Reports/sowingReports.html',data_html = data)
+
+@admin.route('/Reports')
+def Reports():
+    data = RepoDashboard()
+    
+    return render_template('admin/Reports/Reports.html',data_html = data)
