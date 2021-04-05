@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+{% block content %}
+<head>
+               <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Sowing Reports</h1>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12 pb-5">
+        <div class="card">
+                <h5 class="card-header">Comparitive Board Analysis</h5>
+                <div class="card-body">
+                <h5 class="card-title">&nbsp;</h5>
+                <p class="card-text">{{ plot_histo|safe }}</p>
+                <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+    {% for x,v in data_html.items() %}
+    <div class="col-sm-3 pb-5">
+        <div class="card">
+                <h5 class="card-header">Board Analysis</h5>
+                <div class="card-body">
+                <h5 class="card-title">{{ x }}</h5>
+                <p class="card-text">{{ v|safe }}</p>
+                <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
