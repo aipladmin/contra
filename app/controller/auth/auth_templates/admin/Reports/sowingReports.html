@@ -1,0 +1,14 @@
+{% extends 'index.html'%}
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+      <h1 class="h3 mb-0 text-gray-800">Sowing Reports</h1>
+    </div>
+</div>
+<div class="container-fluid">
+    {{ data_html|safe }}
+</div>
+{% endblock %}

@@ -38,3 +38,40 @@ def report1():
     datf = datf.to_html(classes='table table-striped')
     return datf
 
+################ Sowing Data ######################################
+def report2():
+
+    data = mysql_query(
+    '''
+    select Distinct Pallete_Data.Pallete_Name as Boards,System_Name,Date as Sowing_date,PD_No_of_Cavity as Total_Cavity,PD_No_of_Seeds as Sown_Per_Cavity,PD_No_of_Cavity*PD_No_of_Seeds as Total_Sown,"" as Germinated,Quantity ,"" as Dead_After_Germination,"" as Total,"" as Remaining from seeds_master Inner join Manufacturer_Seeds on seeds_master.SEEDSID=Manufacturer_Seeds.SEEDSID Inner join Pallete_Master on Pallete_Master.MSID=Manufacturer_Seeds.MSID Inner Join Pallete_Data on Pallete_Data.PMID=Pallete_Master.PMID Inner join Grow_Channel on Grow_Channel.PMID=Pallete_Data.PMID Inner join Grow_Channel_Name on Grow_Channel_Name.GCNID=Grow_Channel.GCNID Inner Join Grow_System on Grow_Channel_Name.GSID=Grow_System.GSID;
+    ''')
+    data = pd.DataFrame(data)
+    #Germinated
+    # data.iat[0,5]=10
+    # data.iat[3,5]=30
+    # data.iat[9,5]=65
+    # data.iat[15,5]=65
+    # data.iat[18,5]=65
+    # data.iat[18,5]=30
+    # data.iat[21,5]=10
+    # data.iat[45,5]=25
+    # data.iat[63,5]=30
+
+    # #Dead_after_Germn
+    # data.iat[0,7]=0
+    # data.iat[3,7]=0
+    # data.iat[9,7]=5
+    # data.iat[15,7]=1
+    # data.iat[18,7]=14
+    # data.iat[21,7]=1
+    # data.iat[45,7]=10
+    # data.iat[63,7]=1
+
+    pvt=pd.pivot_table(data,index=['Boards','Sowing_date','Total_Cavity','Sown_Per_Cavity','Total_Sown'],columns=["System_Name"],values='Quantity',aggfunc="first")
+    pvt.fillna('-')
+
+    # data.dropna(axis=0,how='any')
+    data = data.to_html(classes="table table-striped")
+    return data
+
+  
