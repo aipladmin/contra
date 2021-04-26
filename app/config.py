@@ -3,8 +3,8 @@ from datetime import datetime,timedelta
 from flask import g,sessions
 
 class Config(object):
-    TESTING = True
-    DEBUG = True
+    TESTING = False
+    DEBUG = False
     FLASK_ENV='production'
 
 
