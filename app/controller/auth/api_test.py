@@ -1,6 +1,6 @@
 import requests
 
-BASE = "http://127.0.0.1:8000"
+BASE = "http://contradashboard.online"
 
 response = requests.post(BASE+"/contra",{'name':'qwerty','phone':'views','email':'likes'})
 print(response.json())
