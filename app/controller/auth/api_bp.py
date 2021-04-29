@@ -1,5 +1,5 @@
 from flask import Flask,Blueprint,request
-
+import traceback
 from datetime import date
 from flask_restful import Resource,reqparse
 from ..controller import *
@@ -8,9 +8,11 @@ from ..controller import *
 api_bp = Blueprint('api', __name__)
 
 Contra1args = reqparse.RequestParser()
-Contra1args.add_argument('name', type=str,required=True,help="Name cannot be blank!")
-Contra1args.add_argument('phone', type=str,required=True,help="Phone cannot be blank!")
-Contra1args.add_argument('email', type=str,required=True,help="Email cannot be blank!")
+Contra1args.add_argument('name', type=str)
+Contra1args.add_argument('phone', type=int)
+Contra1args.add_argument('email', type=str)
+Contra1args.add_argument('password', type=str)
+
 
 
 def initialize_routes(api):
@@ -25,7 +27,19 @@ class contra(Resource):
     
     def post(self):
         args = Contra1args.parse_args()
-        return {'task':args}
+        try:
+            mysql_query(''' INSERT INTO `contra`.`auth`
+                    (UTMID,
+                    `Name`,
+                    `Phone`,
+                    `Emailid`,password)
+                    VALUES
+                    (1,'{}',{},'{}',md5('{}'));
+                    '''.format(args['name'],args['phone'],args['email'],args['password']))
+            return {'Success':'Record Inserted'}
+        except Exception as e:
+            return {'Failure':str(traceback.format_exc())}            
+        
 
 
 class contraEP2(Resource):
