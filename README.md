@@ -40,6 +40,6 @@ python application.py
 This command will create a package and run your application.<br/>
 To open it in a browser go to this URL;
 ```
-http://127.0.0.1:8000/user/index
+http://127.0.0.1:8000/
 ```
 
