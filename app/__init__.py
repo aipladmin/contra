@@ -1,6 +1,5 @@
 from flask import Flask,Blueprint
 from flask_mail import Mail
-from flaskext.mysql import MySQL
 from flask_restful import Api
 import decimal,flask.json
 from .config import Config
