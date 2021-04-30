@@ -13,10 +13,13 @@ Contra1args.add_argument('phone', type=int)
 Contra1args.add_argument('email', type=str)
 Contra1args.add_argument('password', type=str)
 
-
+loginArgs = reqparse.RequestParser()
+loginArgs.add_argument('email', type=str)
+loginArgs.add_argument('password', type=str)
 
 def initialize_routes(api):
     api.add_resource(contra,'/contra')
+    api.add_resource(login,'/api/login')
     api.add_resource(contraEP2,'/contraEP2')
 
 
@@ -40,7 +43,23 @@ class contra(Resource):
         except Exception as e:
             return {'Failure':str(traceback.format_exc())}            
         
-
+class login(Resource):
+    def get(self):
+        
+        return {'status':"success"}
+    
+    def post(self):
+        args = loginArgs.parse_args()
+        try:
+            data = mysql_query(''' select Name,Phone,Emailid,Role from auth inner join user_type_master ON auth.UTMID=user_type_master.UTMID where auth.emailid='{}' and auth.password=md5('{}') limit 1; '''.format(args['email'],args['password']))
+            print(data)
+            if len(data) == 0:
+                return {'Result':'User Does Not Exsist'}
+            else:
+                return {'Result':data[0]}
+        except Exception as e:
+            return {'Failure':str(traceback.format_exc())}            
+        
 
 class contraEP2(Resource):
     def get(self):
