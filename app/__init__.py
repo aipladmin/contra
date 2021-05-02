@@ -58,7 +58,6 @@ def create_app():
     initialize_routes(api)
 
     app.register_blueprint(api_bp.api_bp)  
-    
     docs = FlaskApiSpec(app)
 
     docs.register(contra)
