@@ -19,7 +19,7 @@ def create_app():
 
     app.config.from_object(Config)
  
-    app.json_encoder = Config.MyJSONEncoder
+ 
     
 
     mail = Mail()
