@@ -50,14 +50,14 @@ class contraRequestSchema(Schema):
     password = fields.Str(required=True,description="API Type") 
     
 class contra(MethodResource,Resource):
-    @doc(description='User Registration', tags=['Awesome'])
+    @doc(description='User Registration', tags=['User Registration'])
     # @use_kwargs(contraRequestSchema,location=('json'))
     # @marshal_with(contraResponseSchema)
     def get(self):
         
         return {'message':"success"}
 
-    @doc(description='User Registration', tags=['Awesome'] )
+    @doc(description='User Registration', tags=['User Registration'] )
     @use_kwargs(contraRequestSchema,location=('json'),name='Body',required=True)
     @marshal_with(contraResponseSchema)
     def post(self):
@@ -83,7 +83,7 @@ class loginRequestSchema(Schema):
     email = fields.Str()
     password = fields.Str()
 class login(MethodResource,Resource):
-    @doc(description='Login', tags=['login'] )
+    @doc(description='Login', tags=['Login'] )
     @use_kwargs(loginRequestSchema,location=('json'),name='Body',required=True)
     @marshal_with(loginResponseSchema,code="404",description="Not Found")
     
@@ -118,7 +118,7 @@ class resetPassword(MethodResource,Resource):
         print(data)
         if data[0]['UE'] == 1:
             otp = password_generator(6)
-            deets = {'Emailid':args['email'],'Subject':'OTP','OTP':otp,'salutation':"salutation"}
+            deets = {'Emailid':args['email'],'Subject':'OTP','OTP':otp,'salutation':"Forgot Password"}
             send_mail(**deets)
             mysql_query("update auth SET password = md5('{}') where emailid ='{}';".format(otp,args['email']))
             return {'status':'Success'}

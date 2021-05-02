@@ -2,8 +2,8 @@ import decimal,flask.json
 from datetime import datetime,timedelta
 
 class Config(object):
-    TESTING = True
-    DEBUG = True
+    TESTING = False
+    DEBUG = False
     FLASK_ENV='production'
 
 
