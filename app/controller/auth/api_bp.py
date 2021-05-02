@@ -118,7 +118,7 @@ class resetPassword(MethodResource,Resource):
         print(data)
         if data[0]['UE'] == 1:
             otp = password_generator(6)
-            deets = {'Emailid':args['email'],'Subject':'OTP','OTP':otp,'salutation':"salutation"}
+            deets = {'Emailid':args['email'],'Subject':'OTP','OTP':otp,'salutation':"Forgot Password"}
             send_mail(**deets)
             mysql_query("update auth SET password = md5('{}') where emailid ='{}';".format(otp,args['email']))
             return {'status':'Success'}
