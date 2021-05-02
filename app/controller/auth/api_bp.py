@@ -83,7 +83,7 @@ class loginRequestSchema(Schema):
     email = fields.Str()
     password = fields.Str()
 class login(MethodResource,Resource):
-    @doc(description='Login', tags=['login'] )
+    @doc(description='Login', tags=['Login'] )
     @use_kwargs(loginRequestSchema,location=('json'),name='Body',required=True)
     @marshal_with(loginResponseSchema,code="404",description="Not Found")
     
