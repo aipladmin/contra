@@ -50,14 +50,14 @@ class contraRequestSchema(Schema):
     password = fields.Str(required=True,description="API Type") 
     
 class contra(MethodResource,Resource):
-    @doc(description='User Registration', tags=['Awesome'])
+    @doc(description='User Registration', tags=['User Registration'])
     # @use_kwargs(contraRequestSchema,location=('json'))
     # @marshal_with(contraResponseSchema)
     def get(self):
         
         return {'message':"success"}
 
-    @doc(description='User Registration', tags=['Awesome'] )
+    @doc(description='User Registration', tags=['User Registration'] )
     @use_kwargs(contraRequestSchema,location=('json'),name='Body',required=True)
     @marshal_with(contraResponseSchema)
     def post(self):
