@@ -3,7 +3,10 @@ from flask_mail import Mail
 from flask_restful import Api
 import decimal,flask.json
 from .config import Config
-from .controller.auth.api_bp import initialize_routes
+from .controller.auth.api_bp import contra, forgotpasswordRequestSchema, initialize_routes, login, resetPassword
+from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
+from flask_apispec.extension import FlaskApiSpec
 
 def create_app():
     app = Flask(
