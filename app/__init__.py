@@ -59,4 +59,9 @@ def create_app():
 
     app.register_blueprint(api_bp.api_bp)  
     
+    docs = FlaskApiSpec(app)
+
+    docs.register(contra)
+    docs.register(login)
+    docs.register(resetPassword)
     return app
