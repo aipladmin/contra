@@ -3,7 +3,10 @@ from flask_mail import Mail
 from flask_restful import Api
 import decimal,flask.json
 from .config import Config
-from .controller.auth.api_bp import initialize_routes
+from .controller.auth.api_bp import contra, forgotpasswordRequestSchema, initialize_routes, login, resetPassword
+from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
+from flask_apispec.extension import FlaskApiSpec
 
 def create_app():
     app = Flask(
@@ -16,8 +19,19 @@ def create_app():
 
     app.config.from_object(Config)
  
-    app.json_encoder = Config.MyJSONEncoder
+ 
     
+    app.config.update({
+    'APISPEC_SPEC': APISpec(
+        title='Contra Project',
+        version='v1',
+        plugins=[MarshmallowPlugin()],
+        openapi_version='2.0.0'
+    ),
+    'APISPEC_SWAGGER_URL': '/swagger/',  # URI to access API Doc JSON 
+    'APISPEC_SWAGGER_UI_URL': '/swagger-ui/'  # URI to access UI of API Doc
+})
+    """ app.json_encoder = Config.MyJSONEncoder """
 
     mail = Mail()
     app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -44,5 +58,9 @@ def create_app():
     initialize_routes(api)
 
     app.register_blueprint(api_bp.api_bp)  
-    
+    docs = FlaskApiSpec(app)
+
+    docs.register(contra)
+    docs.register(login)
+    docs.register(resetPassword)
     return app

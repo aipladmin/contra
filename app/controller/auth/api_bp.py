@@ -1,21 +1,30 @@
+from app.controller.auth.auth import password_generator
 from flask import Flask,Blueprint
 import traceback
+from flask_apispec.annotations import doc
 from datetime import date
-from flask_restful import Resource,reqparse
+from flask_restful import Resource,reqparse,fields
 from ..controller import *
+from flask_apispec import marshal_with,MethodResource,use_kwargs
+
+from marshmallow import Schema, fields
+
+# contra_response_schema = dict(
+#     message=fields.String(default='')
+# )
 
 
 api_bp = Blueprint('api', __name__)
 
 Contra1args = reqparse.RequestParser()
-Contra1args.add_argument('name', type=str)
-Contra1args.add_argument('phone', type=int)
-Contra1args.add_argument('email', type=str)
-Contra1args.add_argument('password', type=str)
+Contra1args.add_argument('name', type=str,required=True)
+Contra1args.add_argument('phone', type=int,required=True)
+Contra1args.add_argument('email', type=str,required=True)
+Contra1args.add_argument('password', type=str,required=True)
 
 loginArgs = reqparse.RequestParser()
-loginArgs.add_argument('email', type=str)
-loginArgs.add_argument('password', type=str)
+loginArgs.add_argument('email', type=str,required=True)
+loginArgs.add_argument('password', type=str,required=True)
 
 masterinfoArgs =  reqparse.RequestParser()
 masterinfoArgs.add_argument('master', type=str)
@@ -25,13 +34,32 @@ def initialize_routes(api):
     api.add_resource(login,'/api/login')
     api.add_resource(masterInfo,'/api/masterinfo')
     api.add_resource(contraEP2,'/contraEP2')
+    api.add_resource(resetPassword,'/api/resetpassword')
 
+resetpasswordArgs = reqparse.RequestParser()
+resetpasswordArgs.add_argument('email',required=True)
 
-class contra(Resource):
+############### !# CONTRA
+class contraResponseSchema(Schema):
+    message = fields.Str(default='Success')
+
+class contraRequestSchema(Schema):
+    name = fields.Str(required=True,description="API Type",)
+    phone = fields.Int(required=True,description="API Type")
+    email = fields.Str(required=True,description="API Type")
+    password = fields.Str(required=True,description="API Type") 
+    
+class contra(MethodResource,Resource):
+    @doc(description='User Registration', tags=['Awesome'])
+    # @use_kwargs(contraRequestSchema,location=('json'))
+    # @marshal_with(contraResponseSchema)
     def get(self):
         
-        return {'status':"success"}
-    
+        return {'message':"success"}
+
+    @doc(description='User Registration', tags=['Awesome'] )
+    @use_kwargs(contraRequestSchema,location=('json'),name='Body',required=True)
+    @marshal_with(contraResponseSchema)
     def post(self):
         args = Contra1args.parse_args()
         try:
@@ -46,11 +74,18 @@ class contra(Resource):
             return {'Success':'Record Inserted'}
         except Exception as e:
             return {'Failure':str(traceback.format_exc())}            
-        
-class login(Resource):
-    def get(self):
-        
-        return {'status':"success"}
+
+############### !# LOGIN
+class loginResponseSchema(Schema):
+    message = fields.Str(default='Success')
+
+class loginRequestSchema(Schema):
+    email = fields.Str()
+    password = fields.Str()
+class login(MethodResource,Resource):
+    @doc(description='Login', tags=['login'] )
+    @use_kwargs(loginRequestSchema,location=('json'),name='Body',required=True)
+    @marshal_with(loginResponseSchema,code="404",description="Not Found")
     
     def post(self):
         args = loginArgs.parse_args()
@@ -58,12 +93,37 @@ class login(Resource):
             data = mysql_query(''' select Name,Phone,Emailid,Role from auth inner join user_type_master ON auth.UTMID=user_type_master.UTMID where auth.emailid='{}' and auth.password=md5('{}') limit 1; '''.format(args['email'],args['password']))
             print(data)
             if len(data) == 0:
-                return {'Result':'User Does Not Exsist'}
+                return {'Result':'User Does Not Exist'},404
             else:
-                return {'Result':data[0]}
+                
+                return {'Result':data[0]},200
         except Exception as e:
             return {'Failure':str(traceback.format_exc())}            
 
+############### !# FORGOT PASSWORD
+class forgotpasswordResponseSchema(Schema):
+    message = fields.Str(default='Success')
+
+class forgotpasswordRequestSchema(Schema):
+    email = fields.Str()
+class resetPassword(MethodResource,Resource):
+    @doc(description='Forgot Password', tags=['Forgot Password'] )
+    @use_kwargs(forgotpasswordRequestSchema,location=('json'))
+    @marshal_with(forgotpasswordResponseSchema)
+    def post(self):
+        print('#'*100)
+        args = resetpasswordArgs.parse_args()
+        print(resetpasswordArgs)
+        data = mysql_query("select count(*) as 'UE' from auth where emailid = '{}';".format(args['email']))
+        print(data)
+        if data[0]['UE'] == 1:
+            otp = password_generator(6)
+            deets = {'Emailid':args['email'],'Subject':'OTP','OTP':otp,'salutation':"salutation"}
+            send_mail(**deets)
+            mysql_query("update auth SET password = md5('{}') where emailid ='{}';".format(otp,args['email']))
+            return {'status':'Success'}
+        else:
+            return {'status':'No User'}
 class masterInfo(Resource):
     def get(self):
         args = masterinfoArgs.parse_args()
