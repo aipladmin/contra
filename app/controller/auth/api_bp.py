@@ -37,7 +37,7 @@ def initialize_routes(api):
     api.add_resource(resetPassword,'/api/resetpassword')
 
 resetpasswordArgs = reqparse.RequestParser()
-resetpasswordArgs.add_argument('email',required=True)
+resetpasswordArgs.add_argument('email',required=True,help="Email address Required.")
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
@@ -102,7 +102,7 @@ class login(MethodResource,Resource):
 
 ############### !# FORGOT PASSWORD
 class forgotpasswordResponseSchema(Schema):
-    message = fields.Str(default='Success')
+    status = fields.Str(default='Success')
 
 class forgotpasswordRequestSchema(Schema):
     email = fields.Str()
@@ -112,8 +112,9 @@ class resetPassword(MethodResource,Resource):
     @marshal_with(forgotpasswordResponseSchema)
     def post(self):
         print('#'*100)
+        print(self)
         args = resetpasswordArgs.parse_args()
-        print(resetpasswordArgs)
+
         data = mysql_query("select count(*) as 'UE' from auth where emailid = '{}';".format(args['email']))
         print(data)
         if data[0]['UE'] == 1:
