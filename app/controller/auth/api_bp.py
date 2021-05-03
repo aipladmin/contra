@@ -111,8 +111,6 @@ class resetPassword(MethodResource,Resource):
     @use_kwargs(forgotpasswordRequestSchema,location=('json'))
     @marshal_with(forgotpasswordResponseSchema)
     def post(self):
-        print('#'*100)
-        print(self)
         args = resetpasswordArgs.parse_args()
 
         data = mysql_query("select count(*) as 'UE' from auth where emailid = '{}';".format(args['email']))
