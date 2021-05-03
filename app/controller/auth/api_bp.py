@@ -17,10 +17,10 @@ from marshmallow import Schema, fields
 api_bp = Blueprint('api', __name__)
 
 Contra1args = reqparse.RequestParser()
-Contra1args.add_argument('name', type=str,required=True)
-Contra1args.add_argument('phone', type=int,required=True)
-Contra1args.add_argument('email', type=str,required=True)
-Contra1args.add_argument('password', type=str,required=True)
+Contra1args.add_argument('name', type=str,required=True,help="Name is required")
+Contra1args.add_argument('phone', type=int,required=True,help="Phone is required")
+Contra1args.add_argument('email', type=str,required=True,help="Email ID is required")
+Contra1args.add_argument('password', type=str,required=True,help="Password is required")
 
 loginArgs = reqparse.RequestParser()
 loginArgs.add_argument('email', type=str,required=True)
