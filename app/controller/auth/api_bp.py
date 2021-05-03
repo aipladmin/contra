@@ -44,10 +44,10 @@ class contraResponseSchema(Schema):
     message = fields.Str(default='Success')
 
 class contraRequestSchema(Schema):
-    name = fields.Str(required=True,description="API Type",)
-    phone = fields.Int(required=True,description="API Type")
-    email = fields.Str(required=True,description="API Type")
-    password = fields.Str(required=True,description="API Type") 
+    name = fields.String()
+    phone = fields.Int()
+    email = fields.String()
+    password = fields.String()
     
 class contra(MethodResource,Resource):
     @doc(description='User Registration', tags=['User Registration'])
@@ -80,8 +80,8 @@ class loginResponseSchema(Schema):
     message = fields.Str(default='Success')
 
 class loginRequestSchema(Schema):
-    email = fields.Str()
-    password = fields.Str()
+    email = fields.String()
+    password = fields.String()
 class login(MethodResource,Resource):
     @doc(description='Login', tags=['Login'] )
     @use_kwargs(loginRequestSchema,location=('json'),name='Body',required=True)
@@ -105,7 +105,7 @@ class forgotpasswordResponseSchema(Schema):
     status = fields.Str(default='Success')
 
 class forgotpasswordRequestSchema(Schema):
-    email = fields.Str()
+    email = fields.String()
 class resetPassword(MethodResource,Resource):
     @doc(description='Forgot Password', tags=['Forgot Password'] )
     @use_kwargs(forgotpasswordRequestSchema,location=('json'))
