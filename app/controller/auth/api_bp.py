@@ -17,10 +17,10 @@ from marshmallow import Schema, fields
 api_bp = Blueprint('api', __name__)
 
 Contra1args = reqparse.RequestParser()
-Contra1args.add_argument('name', type=str,required=True)
-Contra1args.add_argument('phone', type=int,required=True)
-Contra1args.add_argument('email', type=str,required=True)
-Contra1args.add_argument('password', type=str,required=True)
+Contra1args.add_argument('name', type=str,required=True,help="Name is required")
+Contra1args.add_argument('phone', type=int,required=True,help="Phone is required")
+Contra1args.add_argument('email', type=str,required=True,help="Email ID is required")
+Contra1args.add_argument('password', type=str,required=True,help="Password is required")
 
 loginArgs = reqparse.RequestParser()
 loginArgs.add_argument('email', type=str,required=True)
@@ -37,17 +37,17 @@ def initialize_routes(api):
     api.add_resource(resetPassword,'/api/resetpassword')
 
 resetpasswordArgs = reqparse.RequestParser()
-resetpasswordArgs.add_argument('email',required=True)
+resetpasswordArgs.add_argument('email',required=True,help="Email address Required.")
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
     message = fields.Str(default='Success')
 
 class contraRequestSchema(Schema):
-    name = fields.Str(required=True,description="API Type",)
-    phone = fields.Int(required=True,description="API Type")
-    email = fields.Str(required=True,description="API Type")
-    password = fields.Str(required=True,description="API Type") 
+    name = fields.String()
+    phone = fields.Int()
+    email = fields.String()
+    password = fields.String()
     
 class contra(MethodResource,Resource):
     @doc(description='User Registration', tags=['User Registration'])
@@ -80,8 +80,8 @@ class loginResponseSchema(Schema):
     message = fields.Str(default='Success')
 
 class loginRequestSchema(Schema):
-    email = fields.Str()
-    password = fields.Str()
+    email = fields.String()
+    password = fields.String()
 class login(MethodResource,Resource):
     @doc(description='Login', tags=['Login'] )
     @use_kwargs(loginRequestSchema,location=('json'),name='Body',required=True)
@@ -102,18 +102,17 @@ class login(MethodResource,Resource):
 
 ############### !# FORGOT PASSWORD
 class forgotpasswordResponseSchema(Schema):
-    message = fields.Str(default='Success')
+    status = fields.Str(default='Success')
 
 class forgotpasswordRequestSchema(Schema):
-    email = fields.Str()
+    email = fields.String()
 class resetPassword(MethodResource,Resource):
     @doc(description='Forgot Password', tags=['Forgot Password'] )
     @use_kwargs(forgotpasswordRequestSchema,location=('json'))
     @marshal_with(forgotpasswordResponseSchema)
     def post(self):
-        print('#'*100)
         args = resetpasswordArgs.parse_args()
-        print(resetpasswordArgs)
+
         data = mysql_query("select count(*) as 'UE' from auth where emailid = '{}';".format(args['email']))
         print(data)
         if data[0]['UE'] == 1:
