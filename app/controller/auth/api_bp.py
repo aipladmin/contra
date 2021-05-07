@@ -29,10 +29,18 @@ loginArgs.add_argument('password', type=str,required=True)
 masterinfoArgs =  reqparse.RequestParser()
 masterinfoArgs.add_argument('master', type=str)
 
+updateProfileArgs = reqparse.RequestParser()
+updateProfileArgs.add_argument('name', type=str,required=True,help="Name is required")
+updateProfileArgs.add_argument('phone', type=int,required=True,help="Phone is required")
+updateProfileArgs.add_argument('email', type=str,required=True,help="Email ID is required")
+updateProfileArgs.add_argument('old_email', type=str,required=True,help="Old Email ID is required")
+updateProfileArgs.add_argument('password', type=str,required=True,help="Password is required")
+
 def initialize_routes(api):
     api.add_resource(contra,'/contra')
     api.add_resource(login,'/api/login')
     api.add_resource(masterInfo,'/api/masterinfo')
+    api.add_resource(updateProfile,'/api/updateProfile')
     api.add_resource(contraEP2,'/contraEP2')
     api.add_resource(resetPassword,'/api/resetpassword')
 
@@ -123,6 +131,34 @@ class resetPassword(MethodResource,Resource):
             return {'status':'Success'}
         else:
             return {'status':'No User'}
+
+class updateProfileRequestSchema(Schema):
+    name = fields.String()
+    phone = fields.Int()
+    email = fields.String()
+    old_email = fields.String()
+    password = fields.String()
+
+
+class updateProfileResponseSchema(Schema):
+    status = fields.Str(default='Success')
+class updateProfile(MethodResource,Resource):
+    def post(self):
+        args = updateProfileArgs.parse_args()
+
+        data = mysql_query(''' UPDATE `contra`.`auth`
+                                SET
+                                `Name` = '{}',
+                                `Phone` = {},
+                                `Emailid` = '{}',
+                                `Password` = md5('{}')
+                            WHERE `Emailid` = '{}';
+                                '''.format(args['name'], args['phone'], args['email'], args['password'],args['old_email']))
+        if mysql_query.row_count > 0:
+            return {'status':'success'}
+        else:
+            return {'status':'No user Exist'}
+
 class masterInfo(Resource):
     def get(self):
         args = masterinfoArgs.parse_args()
