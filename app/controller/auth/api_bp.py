@@ -34,13 +34,17 @@ updateProfileArgs.add_argument('name', type=str,required=True,help="Name is requ
 updateProfileArgs.add_argument('phone', type=int,required=True,help="Phone is required")
 updateProfileArgs.add_argument('email', type=str,required=True,help="Email ID is required")
 updateProfileArgs.add_argument('old_email', type=str,required=True,help="Old Email ID is required")
-updateProfileArgs.add_argument('password', type=str,required=True,help="Password is required")
+
+changePasswordArgs = reqparse.RequestParser()
+changePasswordArgs.add_argument('password', type=str)
+changePasswordArgs.add_argument('email', type=str)
 
 def initialize_routes(api):
     api.add_resource(contra,'/contra')
     api.add_resource(login,'/api/login')
     api.add_resource(masterInfo,'/api/masterinfo')
     api.add_resource(updateProfile,'/api/updateProfile')
+    api.add_resource(changePassword,'/api/changepassword')
     api.add_resource(contraEP2,'/contraEP2')
     api.add_resource(resetPassword,'/api/resetpassword')
 
@@ -132,13 +136,12 @@ class resetPassword(MethodResource,Resource):
         else:
             return {'status':'No User'}
 
+############### !# Update Profile #############
 class updateProfileRequestSchema(Schema):
     name = fields.String()
     phone = fields.Int()
     email = fields.String()
     old_email = fields.String()
-    password = fields.String()
-
 
 class updateProfileResponseSchema(Schema):
     status = fields.Str(default='Success')
@@ -151,9 +154,32 @@ class updateProfile(MethodResource,Resource):
                                 `Name` = '{}',
                                 `Phone` = {},
                                 `Emailid` = '{}',
-                                `Password` = md5('{}')
                             WHERE `Emailid` = '{}';
-                                '''.format(args['name'], args['phone'], args['email'], args['password'],args['old_email']))
+                                '''.format(args['name'], args['phone'], args['email'],args['old_email']))
+        if mysql_query.row_count > 0:
+            return {'status':'success'}
+        else:
+            return {'status':'No user Exist'}
+
+############### !# CHANGE PASSWORD
+class changePasswordRequestSchema(Schema):
+    email = fields.String()
+    password = fields.String()
+
+
+
+class changePasswordResponseSchema(Schema):
+    status = fields.Str(default='Success')
+class changePassword(MethodResource,Resource):
+    def post(self):
+        args = changePasswordArgs.parse_args()
+
+        data = mysql_query(''' UPDATE `contra`.`auth`
+                                SET
+                                `Password` = md5('{}')
+                                WHERE `Emailid` = '{}';
+                                '''.format(args['password'],args['email']))
+        print(mysql_query.row_count)
         if mysql_query.row_count > 0:
             return {'status':'success'}
         else:
