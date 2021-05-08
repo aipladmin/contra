@@ -37,6 +37,7 @@ updateProfileArgs.add_argument('old_email', type=str,required=True,help="Old Ema
 
 changePasswordArgs = reqparse.RequestParser()
 changePasswordArgs.add_argument('password', type=str)
+changePasswordArgs.add_argument('old_password', type=str)
 changePasswordArgs.add_argument('email', type=str)
 
 def initialize_routes(api):
@@ -53,7 +54,7 @@ resetpasswordArgs.add_argument('email',required=True,help="Email address Require
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
-    message = fields.Str(default='Success')
+    message = fields.Str()
 
 class contraRequestSchema(Schema):
     name = fields.String()
@@ -81,7 +82,7 @@ class contra(MethodResource,Resource):
                     `Phone`,
                     `Emailid`,password)
                     VALUES
-                    (1,'{}',{},'{}',md5('{}'));
+                    (2,'{}',{},'{}',md5('{}'));
                     '''.format(args['name'],args['phone'],args['email'],args['password']))
             return {'Success':'Record Inserted'}
         except Exception as e:
