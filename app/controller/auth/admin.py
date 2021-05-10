@@ -454,7 +454,7 @@ def PDAJAX():
             return jsonify({"result":"0"})
         else:
             return jsonify({"result":data})
-####################################### PALLETE DATA       ####################
+####################################### PALLETE DATA    ####################
 
 @admin.route('/manufacturers',methods=['GET','POST'])
 @login_required
