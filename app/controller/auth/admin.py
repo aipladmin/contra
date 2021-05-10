@@ -400,12 +400,18 @@ def palleteData():
     manufacturers = mysql_query("select * from Manufacturer_Master")
     seeds = mysql_query("select * from seeds_master")
     Palletes_Name=mysql_query("select distinct(Pallete_Name) from Pallete_Data;")
-    return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name)
+    germination = mysql_query("select * from germination")
+    return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name,germination=germination)
 
 @admin.route('/PDAJAX',methods=['POST'])
 @login_required
 def PDAJAX():
     print("READING..........................")
+    if request.form['Request_ID'] == "0":
+        print(request.form)
+        data = mysql_query("Select * from Pallete_Master inner join germination ON germination.GID=Pallete_Master.GID where Pallete_Master.GID={};".format(request.form['germination_id']))
+        print(data)
+        return jsonify({'result':data})
     if request.form['Request_ID'] == "1":
         print(request.form['method'])
         data = mysql_query(''' SELECT 
@@ -454,7 +460,7 @@ def PDAJAX():
             return jsonify({"result":"0"})
         else:
             return jsonify({"result":data})
-####################################### PALLETE DATA    ####################
+####################################### MANUFACTURER DATA    ####################
 
 @admin.route('/manufacturers',methods=['GET','POST'])
 @login_required
