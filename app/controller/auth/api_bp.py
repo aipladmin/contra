@@ -16,11 +16,11 @@ from marshmallow import Schema, fields
 
 api_bp = Blueprint('api', __name__)
 
-Contra1args = reqparse.RequestParser()
-Contra1args.add_argument('name', type=str,required=True,help="Name is required")
-Contra1args.add_argument('phone', type=int,required=True,help="Phone is required")
-Contra1args.add_argument('email', type=str,required=True,help="Email ID is required")
-Contra1args.add_argument('password', type=str,required=True,help="Password is required")
+registration = reqparse.RequestParser()
+registration.add_argument('name', type=str,required=True,help="Name is required")
+registration.add_argument('phone', type=int,required=True,help="Phone is required")
+registration.add_argument('email', type=str,required=True,help="Email ID is required")
+registration.add_argument('password', type=str,required=True,help="Password is required")
 
 loginArgs = reqparse.RequestParser()
 loginArgs.add_argument('email', type=str,required=True)
@@ -41,7 +41,7 @@ changePasswordArgs.add_argument('old_password', type=str)
 changePasswordArgs.add_argument('email', type=str)
 
 def initialize_routes(api):
-    api.add_resource(contra,'/contra')
+    api.add_resource(contra,'/api/registration')
     api.add_resource(login,'/api/login')
     api.add_resource(masterInfo,'/api/masterinfo')
     api.add_resource(updateProfile,'/api/updateProfile')
@@ -54,7 +54,7 @@ resetpasswordArgs.add_argument('email',required=True,help="Email address Require
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
-    message = fields.Str()
+    message = fields.Str(default='Success')
 
 class contraRequestSchema(Schema):
     name = fields.String()
@@ -74,7 +74,7 @@ class contra(MethodResource,Resource):
     @use_kwargs(contraRequestSchema,location=('json'),name='Body',required=True)
     @marshal_with(contraResponseSchema)
     def post(self):
-        args = Contra1args.parse_args()
+        args = registration.parse_args()
         try:
             mysql_query(''' INSERT INTO `contra`.`auth`
                     (UTMID,
@@ -84,9 +84,11 @@ class contra(MethodResource,Resource):
                     VALUES
                     (2,'{}',{},'{}',md5('{}'));
                     '''.format(args['name'],args['phone'],args['email'],args['password']))
-            return {'Success':'Record Inserted'}
+            
         except Exception as e:
-            return {'Failure':str(traceback.format_exc())}            
+           print("Oops!", e.__class__, "occurred.")
+           return jsonify({'Error: ':str(e.__class__)})
+
 
 ############### !# LOGIN
 class loginResponseSchema(Schema):

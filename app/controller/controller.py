@@ -1,5 +1,4 @@
-import sqlite3,pdfkit
-# import email
+import sqlite3
 from flaskext.mysql import *
 from functools import wraps
 from flask_mail import Mail,Message
@@ -92,12 +91,8 @@ def sql_query(sql, sqldt):
 # MAIL DRIVER
 def send_mail(**deets):
     mail = Mail()
-        # with current_app.app_context():
-    #     mail = Mail()
-    #     mail.send(msg)
-    # print(deets['otp'])
+    
     msg = Message(deets['Subject'], sender = 'developer.websupp@gmail.com', recipients = [deets['Emailid'] ])
-    # print(msg)
     msg.html = render_template('mail.html',emailid=deets['Emailid'],otp=deets['OTP'],salutation = deets['salutation'])
     mail.send(msg)
     return "mail"
