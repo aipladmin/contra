@@ -1,5 +1,5 @@
 from flask import Flask, render_template, Blueprint, request, session, redirect, url_for, abort, jsonify,flash
-from datetime import datetime
+from datetime import date, datetime
 import secrets,json,pdfkit,traceback
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
@@ -197,29 +197,18 @@ def germination_ajax():
 def germination_scr():
     if request.method == "POST":
             try:
-                total = int(request.form['soakedseeds'])+int(request.form['unsoakedseeds'])
+                AID = mysql_query("select AID from auth where Emailid='{}';".format(session['email']))
+                AID = AID[0]['AID']
+                gemcode = session['email'][0:3].capitalize()+request.form['attemptname'][0:3].capitalize()+datetime.now().strftime("/%d%m%y/%H/%M/%S")
+                print(gemcode)
                 mysql_query('''INSERT INTO `contra`.`germination`
-                            (`Attempt_Name`,
-                            `Location`,
-                            `Plant_Name`,
-                            `Cec_Value`,
-                            `Water_Ph`,
-                            `Water_TDS`,
-                            `Sowing_Date`,
-                            `Grow_Medium`,
-                            `Light_Source`,
-                            `Seed_Company`,
-                            `Seed_Variety`,
-                            `Soaked_Seeds`,
-                            `Unsoaked_Seeds`,
-                            `Total`,
-                            `Total_Plants`)
+                            (AID,`Attempt_Name`,
+                            `Location`,Tags,GemCode
+                            )
                             VALUES
-                            ('{}','{}','{}',{},{},{},'{}','{}','{}','{}','{}',{},{},{},{});'''
-                            .format(request.form['attemptname'],request.form['location'],request.form['plantname'],
-                            request.form['Cocopeatecvalue'],request.form['waterph'],request.form['watertds'],request.form['sowingdate'],
-                            request.form['growmedium'],request.form['lightsource'],request.form['seedcompany'],request.form['svariety'],
-                            request.form['soakedseeds'],request.form['unsoakedseeds'],total,request.form['totalplants']))
+                            ({},'{}','{}','{}','{}');'''
+                            .format(AID,request.form['attemptname'],request.form['location'],request.form['tags'],gemcode))
+                            
                 flash("Record(s) Inserted","success")
             except Exception as e:
                 flash("Error: "+str(e),"failure")

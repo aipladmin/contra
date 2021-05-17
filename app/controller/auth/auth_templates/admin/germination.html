@@ -29,86 +29,26 @@
     </div>
     <form method="POST" action="{{ url_for('admin.germination_scr') }}">
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-">
             <label for="inputEmail4">Attempt Name</label>
             <input type="text" name="attemptname"class="form-control" id="inputEmail4">
           </div>
-          <div class="form-group col-md-6">
-            <label for="inputPassword4">Location</label>
-            <input type="text" name="location" class="form-control" id="inputPassword4">
+       </div>
+       <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="Location">Location</label>
+            <input type="text" id="Location" name="location" class="form-control" id="Location">
+          </div>
+        </div>
+       <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="Tags">Tags</label>
+            <input type="text" id="Tags" name="tags" class="form-control" id="Tags">
           </div>
         </div>
         <div class="form-group">
-          <label for="inputAddress">Plant Name</label>
-          <input type="text" name="plantname" class="form-control" id="inputAddress">
+          <button type="submit" class="btn btn-primary">Submit</button>
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-3">
-            <label for="totalplants">Total No of Plants</label>
-            <input type="text"  name="totalplants" class="form-control" id="totalplants">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="inputCity">Water PH</label>
-            <input type="text" name="waterph" class="form-control" id="inputCity">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="inputZip">WaterTDS/EC</label>
-            <input type="text" name="watertds" class="form-control" id="inputZip">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="inputAddress2">Cocopeat EC value</label>
-            <input type="text" name="Cocopeatecvalue" class="form-control" id="inputAddress2">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="inputAddress2">Sowing Date</label>
-            <input type="Date" name="sowingdate" class="form-control" id="inputAddress2">
-          </div>
-          <div class="form-group col-md-6">
-            <label for="inputAddress2">Grow Medium</label>
-            <input type="text" name="growmedium" class="form-control" id="inputAddress2">
-          </div>
-          
-        </div>
-        
-        
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="inputAddress2">Light Source</label>
-            <select name="lightsource" class="custom-select custom-select-md mb-3">
-              <option selected value="">Select Light Source</option>
-              <option value="Natural Light">Natural Light</option>
-              <option value="Illumination">Illumination</option>
-            </select>
-          </div>
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Seed Company</label>
-                <input type="text" name="seedcompany" class="form-control" id="inputAddress2">
-            </div>
-            <div class="form-group col-md-4">
-              <label for="inputAddress2">Seed Variety</label>
-              <input type="text" name="svariety" class="form-control" id="inputAddress2">
-          </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Soaked Seeds</label>
-                <input type="text" name="soakedseeds" class="form-control" id="ss" onkeyup="add()" value="0">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Unsoaked Seeds</label>
-                <input type="text" name="unsoakedseeds" class="form-control" id="us" onkeyup="add()" value="0">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="inputAddress2">Total</label>
-                <input type="text" readonly name="total" class="form-control" id="total">
-            </div>
-            
-
-        </div>
-       
-        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
 </div>
 <script>
@@ -121,5 +61,10 @@
     var display_value = document.getElementById('total');
     display_value.value=parseInt(sum);
   }
+  var x = document.getElementById("demo");
+
+
+
+
 </script>
 {% endblock %}
