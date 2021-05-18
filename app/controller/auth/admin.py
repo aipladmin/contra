@@ -215,7 +215,6 @@ def germination_scr():
 
             return redirect(url_for('admin.germination'))
             
-
     return "germination_scr"
 
 @admin.route('/germinationweekly')
@@ -230,9 +229,9 @@ def germinationweekly_scr():
     if request.method == "POST":
         if 'weekly' in request.form:
             try:
+                print(request.form)
                 mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
-                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.
-                form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
+                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
                 flash("Record Inserted","success")
             except Exception as e:
                 flash("Weekly: "+str(e),"error")
@@ -346,6 +345,8 @@ def palletes():
 @login_required
 def palleteData():
     if request.method =="POST":
+        
+        
         MSID =  mysql_query("select * from Manufacturer_Seeds where MID={} and SEEDSID={};".format(request.form['manufacturer'],request.form['seeds']))
         MSID = MSID[0]['MSID']
         
@@ -356,11 +357,12 @@ def palleteData():
         if len(PMID) == 0:
             mysql_query(''' INSERT INTO `contra`.`Pallete_Master`
                         (`CID`,
+                        `GID`,
                         `MSID`,
                         `Pallete_Name`)
                         VALUES
-                        ({},{},'{}');
-                        '''.format(request.form['pallete_type'],MSID,request.form['pallete_name']))
+                        ({},{},{},'{}');
+                        '''.format(request.form['pallete_type'],request.form['germination_nameselect * from germination;'],MSID,request.form['pallete_name']))
             PMID=mysql_query.last_row_id
 
             mysql_query('''INSERT INTO `contra`.`Pallete_Data`
