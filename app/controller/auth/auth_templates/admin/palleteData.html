@@ -6,6 +6,30 @@
   $(document).ready(function(){
     $('#SF').hide();
     $('#SS').hide();
+
+    $("#germination_id").on('change', function(){
+       $.ajax({
+        data:{
+          Request_ID:"0",
+          germination_id:$("#germination_id").val(),
+                },
+        type:'POST',
+        url:'/admin/PDAJAX'
+      }).done(function(result){
+        if(result.error){alert("Error");}
+        else{
+          // console.log("DATA");
+          var opts = $.parseJSON(JSON.stringify(result.result));
+          // console.log(opts);
+          $('#name').empty();
+          $.each(opts, function(i, d) {
+                    $('#name').append('<option value="' + d.PID + '">' + d.Pallete_Name + '</option>');
+                });
+        }
+      });
+      event.preventDefault();
+    });
+
     $("input[name='method']").on('change',function(){
       $.ajax({
         data:{
@@ -125,7 +149,29 @@
 
 <div class="container-fluid">
 <form method="post" action="{{ url_for('admin.palleteData') }}">
-   <div class="form-group row">
+  <div class="form-group row">
+      <label for="staticEmail" class="col-sm-2 col-form-label">Select Germination Name</label>
+      <div class="col-lg-2 col-sm-4">
+        <select id="germination_id" class="custom-select js-example-tags" name="germination_name">
+          <option>Select</option>
+          {% for x in germination %}
+            <option value="{{ x['GID'] }}">{{ x['Attempt_Name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-sm-5">
+       <div class="alert alert-success" role="alert" id="SS" style="display:none;">
+          Data Fetched.
+
+        </div>
+        <div class="alert alert-danger" role="alert" id="SF" style="display:none;">
+          Not Available! Insert new Pallete.
+        </div>
+      </div>
+    </div>
+  
+  <div class="form-group row">
       <label for="staticEmail" class="col-sm-2 col-form-label">Pallete Name</label>
       <div class="col-lg-2 col-sm-4">
         <select id="name" class="custom-select js-example-tags" name="pallete_name">

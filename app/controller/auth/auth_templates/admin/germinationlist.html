@@ -46,11 +46,11 @@
               <tr>
                 <td>{{ dt['Attempt_Name'] }}</td>
                 <td>{{ dt['Location'] }}</td>
-                <td>{{ dt['Plant_Name'] }}</td>
+                <td>{{ dt['GemCode'] }}</td>
                 <td>
                     <button type="button" class="btn btn-success" data-toggle="modal" 
 
-                    data-target="#{{ dt['Attempt_Name'].strip()~dt['Plant_Name'].strip() }}">
+                    data-target="#{{ dt['Attempt_Name'].strip()~dt['GemCode'].strip().replace('/','') }}">
 
                         <i class="fas fa-plus-circle"></i> Insert Data
                     </button>
@@ -62,7 +62,7 @@
               </td>
               </tr>
 
-            <div class="modal" id="{{ dt['Attempt_Name']~dt['Plant_Name']|replace(' ','') }}">
+            <div class="modal" id="{{ dt['Attempt_Name']~dt['GemCode'].strip().replace('/','') }}">
                 <div class="modal-dialog modal-lg">
                   <div class="modal-content">
 
@@ -125,9 +125,7 @@
                                       <label for="pesticide_volume">Pesticide Volume</label>
                                       <input type="text" name="pesticide_volume" class="form-control" name="volumne" id="pesticide_volume" value="0">
                                   </div>
-                                <!-- </div>                              -->
-<!-- <<<<<<< develop
-=======-->
+
                         </div>
                     </div>
 

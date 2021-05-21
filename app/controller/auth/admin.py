@@ -1,5 +1,5 @@
 from flask import Flask, render_template, Blueprint, request, session, redirect, url_for, abort, jsonify,flash
-from datetime import datetime
+from datetime import date, datetime
 import secrets,json,pdfkit,traceback
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
@@ -197,36 +197,24 @@ def germination_ajax():
 def germination_scr():
     if request.method == "POST":
             try:
-                total = int(request.form['soakedseeds'])+int(request.form['unsoakedseeds'])
+                AID = mysql_query("select AID from auth where Emailid='{}';".format(session['email']))
+                AID = AID[0]['AID']
+                gemcode = session['email'][0:3].capitalize()+request.form['attemptname'][0:3].capitalize()+datetime.now().strftime("/%d%m%y/%H/%M/%S")
+                print(gemcode)
                 mysql_query('''INSERT INTO `contra`.`germination`
-                            (`Attempt_Name`,
-                            `Location`,
-                            `Plant_Name`,
-                            `Cec_Value`,
-                            `Water_Ph`,
-                            `Water_TDS`,
-                            `Sowing_Date`,
-                            `Grow_Medium`,
-                            `Light_Source`,
-                            `Seed_Company`,
-                            `Seed_Variety`,
-                            `Soaked_Seeds`,
-                            `Unsoaked_Seeds`,
-                            `Total`,
-                            `Total_Plants`)
+                            (AID,`Attempt_Name`,
+                            `Location`,Tags,GemCode
+                            )
                             VALUES
-                            ('{}','{}','{}',{},{},{},'{}','{}','{}','{}','{}',{},{},{},{});'''
-                            .format(request.form['attemptname'],request.form['location'],request.form['plantname'],
-                            request.form['Cocopeatecvalue'],request.form['waterph'],request.form['watertds'],request.form['sowingdate'],
-                            request.form['growmedium'],request.form['lightsource'],request.form['seedcompany'],request.form['svariety'],
-                            request.form['soakedseeds'],request.form['unsoakedseeds'],total,request.form['totalplants']))
+                            ({},'{}','{}','{}','{}');'''
+                            .format(AID,request.form['attemptname'],request.form['location'],request.form['tags'],gemcode))
+                            
                 flash("Record(s) Inserted","success")
             except Exception as e:
                 flash("Error: "+str(e),"failure")
 
             return redirect(url_for('admin.germination'))
             
-
     return "germination_scr"
 
 @admin.route('/germinationweekly')
@@ -241,9 +229,9 @@ def germinationweekly_scr():
     if request.method == "POST":
         if 'weekly' in request.form:
             try:
+                print(request.form)
                 mysql_query("insert into germination_weekly(GID,Date,Period,Time,Volume,Dosage_EC,Dosage_PH,Pesticide,Pesticide_Volume) values({},'{}','{}','{}',{},{},{},'{}',{});"
-                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.
-                form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
+                .format(request.form['attempt_id'],request.form['date'],request.form['period_of_time'],request.form['time'],request.form['volume'],request.form['dosage_ec'],request.form['dosage_ph'],request.form['pesticide'],request.form['pesticide_volume'] ) ) 
                 flash("Record Inserted","success")
             except Exception as e:
                 flash("Weekly: "+str(e),"error")
@@ -357,6 +345,8 @@ def palletes():
 @login_required
 def palleteData():
     if request.method =="POST":
+        
+        
         MSID =  mysql_query("select * from Manufacturer_Seeds where MID={} and SEEDSID={};".format(request.form['manufacturer'],request.form['seeds']))
         MSID = MSID[0]['MSID']
         
@@ -367,11 +357,12 @@ def palleteData():
         if len(PMID) == 0:
             mysql_query(''' INSERT INTO `contra`.`Pallete_Master`
                         (`CID`,
+                        `GID`,
                         `MSID`,
                         `Pallete_Name`)
                         VALUES
-                        ({},{},'{}');
-                        '''.format(request.form['pallete_type'],MSID,request.form['pallete_name']))
+                        ({},{},{},'{}');
+                        '''.format(request.form['pallete_type'],request.form['germination_nameselect * from germination;'],MSID,request.form['pallete_name']))
             PMID=mysql_query.last_row_id
 
             mysql_query('''INSERT INTO `contra`.`Pallete_Data`
@@ -400,12 +391,18 @@ def palleteData():
     manufacturers = mysql_query("select * from Manufacturer_Master")
     seeds = mysql_query("select * from seeds_master")
     Palletes_Name=mysql_query("select distinct(Pallete_Name) from Pallete_Data;")
-    return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name)
+    germination = mysql_query("select * from germination")
+    return render_template('admin/palleteData.html',palletes=palletes,manufacturers=manufacturers,seeds=seeds,Palletes_Name=Palletes_Name,germination=germination)
 
 @admin.route('/PDAJAX',methods=['POST'])
 @login_required
 def PDAJAX():
     print("READING..........................")
+    if request.form['Request_ID'] == "0":
+        print(request.form)
+        data = mysql_query("Select * from Pallete_Master inner join germination ON germination.GID=Pallete_Master.GID where Pallete_Master.GID={};".format(request.form['germination_id']))
+        print(data)
+        return jsonify({'result':data})
     if request.form['Request_ID'] == "1":
         print(request.form['method'])
         data = mysql_query(''' SELECT 
@@ -454,7 +451,7 @@ def PDAJAX():
             return jsonify({"result":"0"})
         else:
             return jsonify({"result":data})
-####################################### PALLETE DATA    ####################
+####################################### MANUFACTURER DATA    ####################
 
 @admin.route('/manufacturers',methods=['GET','POST'])
 @login_required
