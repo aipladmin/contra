@@ -192,6 +192,7 @@ def germination_ajax():
 
 
 ####################################################GERMINATION SAPLING
+
 @admin.route('/germination_scr',methods=['POST'])
 @login_required
 def germination_scr():
@@ -203,12 +204,10 @@ def germination_scr():
                 print(gemcode)
                 mysql_query('''INSERT INTO `contra`.`germination`
                             (AID,`Attempt_Name`,
-                            `Location`,Tags,GemCode
-                            )
+                            `Location`,Tags,GemCode)
                             VALUES
                             ({},'{}','{}','{}','{}');'''
                             .format(AID,request.form['attemptname'],request.form['location'],request.form['tags'],gemcode))
-                            
                 flash("Record(s) Inserted","success")
             except Exception as e:
                 flash("Error: "+str(e),"failure")
@@ -340,6 +339,12 @@ def palletes():
             return redirect(url_for('admin.palletes'))
     palletes = mysql_query("select * from cavities")
     return render_template('admin/GerminationTray.html',cavities=palletes)
+
+@admin.route('/palletinfo',methods=['GET', 'POST'])
+@login_required
+def palletinfo():
+    return "palleteInfo"
+
 ####################################### PALLETE DATA       ####################
 @admin.route('/palleteData',methods=['GET','POST'])
 @login_required

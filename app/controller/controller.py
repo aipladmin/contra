@@ -1,6 +1,7 @@
 import sqlite3
 from flaskext.mysql import *
 from functools import wraps
+from datetime import datetime
 from flask_mail import Mail,Message
 from flask import *
 
@@ -53,41 +54,6 @@ def login_required(f):
 
     return wrap
 
-def sql_query(sql, sqldt):
-    # print("SQLDT:"+sqldt)
-    try:
-        print(sql, "        ", sqldt)
-        if sqldt is not None:
-            with sqlite3.connect("app.db") as con:
-                cur = con.cursor()
-                print(sql, "        ", sqldt)
-                cur.execute(sql, sqldt)
-                if sql.split(' ')[0].lower() == "select" :
-                    rows = cur.fetchall()
-                    flag =1
-                else:
-                    con.commit()
-                    flag=0
-
-        if sqldt is None:
-            with sqlite3.connect("app.db") as con:
-                cur = con.cursor()
-                print(sql)
-                cur.execute(sql)
-                rows = cur.fetchall()
-                flag=1
-    except con.Error as e:
-        print("Error: {}".format(e.args[0]))
-    finally:
-        con.close()
-        
-        if flag == 0:
-            con.close()
-            pass
-        else:
-            con.close()
-            return rows
-
 # MAIL DRIVER
 def send_mail(**deets):
     mail = Mail()
@@ -96,3 +62,26 @@ def send_mail(**deets):
     msg.html = render_template('mail.html',emailid=deets['Emailid'],otp=deets['OTP'],salutation = deets['salutation'])
     mail.send(msg)
     return "mail"
+class getUID():
+    def __init__(self,email):
+        self.email = email
+    
+    def getAID(self):
+        AID = mysql_query("select AID from auth where Emailid='{}';".format(self.email))
+        return AID
+class germination(getUID):
+    def __init__(self,email):
+        self.email=email
+        getUID.__init__(self,email)
+    
+    def AddSystem(self,attemptname,location,tags):
+        gemcode = self.email[0:3].capitalize()+attemptname[0:3].capitalize()+datetime.now().strftime("/%d%m%y/%H/%M/%S")
+        AID = self.getAID()
+        AID=AID[0]['AID']
+        print(AID)
+        mysql_query('''INSERT INTO `contra`.`germination`
+                            (AID,`Attempt_Name`,
+                            `Location`,Tags,GemCode)
+                            VALUES
+                            ({},'{}','{}','{}','{}');'''.format(AID,attemptname,location,tags,gemcode))
+        return "DI"
