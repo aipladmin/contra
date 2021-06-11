@@ -47,13 +47,14 @@ def create_app():
 
 
     from app.controller.auth import (
-        auth,admin,api_bp
+        auth,admin,api_bp,hits
     )
     
 
     app.register_blueprint(auth.auth)
     app.register_blueprint(admin.admin)
     app.register_blueprint(api_bp.api_bp)
+    app.register_blueprint(hits.hits)
     api = Api(app)
 
     initialize_routes(api)
