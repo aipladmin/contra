@@ -48,6 +48,7 @@ systemInfoArgs.add_argument("location",type=str,required=True)
 
 JadasAPIArgs = reqparse.RequestParser()
 JadasAPIArgs.add_argument('meters',type=int,required=True)
+JadasAPIArgs.add_argument('ID',type=int,required=True)
 
 def initialize_routes(api):
     api.add_resource(contra,'/api/registration')
@@ -70,7 +71,7 @@ class JadasAPI(Resource):
         print("MADHAV")
         args = JadasAPIArgs.parse_args()
         print(args['meters'])
-        return "data"
+        return jsonify({'Data':{'Meters:':args['meters'],'ID':args['ID']}})
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
