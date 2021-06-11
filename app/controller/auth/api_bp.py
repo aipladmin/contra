@@ -40,17 +40,37 @@ changePasswordArgs.add_argument('password', type=str)
 changePasswordArgs.add_argument('old_password', type=str)
 changePasswordArgs.add_argument('email', type=str)
 
+systemInfoArgs = reqparse.RequestParser()
+systemInfoArgs.add_argument("attemptName",type=str,required=True)
+systemInfoArgs.add_argument("tags",type=str,required=True)
+systemInfoArgs.add_argument("email",type=str,required=True)
+systemInfoArgs.add_argument("location",type=str,required=True)
+
+JadasAPIArgs = reqparse.RequestParser()
+JadasAPIArgs.add_argument('meters',type=int,required=True)
+
 def initialize_routes(api):
     api.add_resource(contra,'/api/registration')
     api.add_resource(login,'/api/login')
-    api.add_resource(masterInfo,'/api/masterinfo')
     api.add_resource(updateProfile,'/api/updateProfile')
     api.add_resource(changePassword,'/api/changepassword')
-    api.add_resource(contraEP2,'/contraEP2')
     api.add_resource(resetPassword,'/api/resetpassword')
+    api.add_resource(systemInfo,'/api/systemInfo')
+    api.add_resource(JadasAPI,'/api/jadas')
 
 resetpasswordArgs = reqparse.RequestParser()
 resetpasswordArgs.add_argument('email',required=True,help="Email address Required.")
+
+
+class JadasAPI(Resource):
+    def get(self):
+        return "data"
+    
+    def post(self):
+        print("MADHAV")
+        args = JadasAPIArgs.parse_args()
+        print(args['meters'])
+        return "data"
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
@@ -169,8 +189,6 @@ class changePasswordRequestSchema(Schema):
     email = fields.String()
     password = fields.String()
 
-
-
 class changePasswordResponseSchema(Schema):
     status = fields.Str(default='Success')
 class changePassword(MethodResource,Resource):
@@ -188,19 +206,8 @@ class changePassword(MethodResource,Resource):
         else:
             return {'status':'No user Exist'}
 
-class masterInfo(Resource):
-    def get(self):
-        args = masterinfoArgs.parse_args()
-        try:
-            data = mysql_query("select * from {};".format(args['master']))
-            if len(data) == 0:
-                return {"Result" : "No Data" }
-            else:
-                return {"Result" :data}
-        except Exception as e:
-            return {'Failure':str(traceback.format_exc())}            
- 
-
-class contraEP2(Resource):
-    def get(self):
-        return {'task': 'Contra Endpoint:2 '}
+class systemInfo(Resource):
+    def post(self):
+        args = systemInfoArgs.parse_args()
+        germinationAPI = germination(email=args['email'])
+        germinationAPI.AddSystem(attemptname=args['attemptName'],tags=args['tags'],location=args['location'])
