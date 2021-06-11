@@ -65,13 +65,21 @@ resetpasswordArgs.add_argument('email',required=True,help="Email address Require
 
 class JadasAPI(Resource):
     def get(self):
-        return "data"
+        data= mysql_query("Select * from Hits.Data;")
+        return jsonify({'Result: ':data})
     
     def post(self):
-        print("MADHAV")
         args = JadasAPIArgs.parse_args()
-        print(args['meters'])
-        return jsonify({'Data':{'Meters:':args['meters'],'ID':args['ID']}})
+        try:
+            mysql_query('''
+                INSERT INTO `Hits`.`Data`
+                (`Meters`,`ID`)
+                VALUES
+                ({},{});'''.format(args['meters'],args['ID']))
+        except pymysql.Error as e:
+            return jsonify({"Error:": "could not close connection error pymysql %d: %s" %(e.args[0], e.args[1])})
+        else:
+            return {'Success':"Success"}
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
