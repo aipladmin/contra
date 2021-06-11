@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, stream_with_context, request
+from flask import Flask, render_template, Blueprint
 from datetime import date, datetime
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.exceptions import HTTPException
@@ -15,16 +15,6 @@ hits = Blueprint('hits',
 @hits.route('/')
 @hits.route('/index')
 def getData():
-    data = mysql_query("select * from Hits.Data")
+    data = mysql_query("select DID,ID,Meters,convert_tz(Timestamp,'+00:00','+5:30') as 'IST' from Hits.Data;")
 
     return render_template('raw_data.html',data=data)
-
-# @hits.route('/stream')
-# def streamed_response():
-#     data = mysql_query("select * from Hits.Data")
-#     def generate():
-#         yield 'Hello '
-#         yield data
-#         yield '!'
-#     for x in generate():
-#         return app.response_class(stream_with_context(generate()))
