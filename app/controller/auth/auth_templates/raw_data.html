@@ -14,6 +14,7 @@
                 {% for x in data[0].keys() %}
                     <th scope="col"> {{ x }} </th>
                 {% endfor %}
+                <th scope="col">Time</th>
             </tr>
         </thead>
         <tbody>
@@ -29,7 +30,10 @@
                     {{ x.Meters }}
                 </td>
                 <td>
-                    {{ x.Timestamp }}
+                    {{ x.IST.strftime("%d-%m-%Y") }}
+                </td>
+                <td>
+                    {{ x.IST.strftime("%H:%M:%S") }}
                 </td>
             </tr>
             {% endfor %}
