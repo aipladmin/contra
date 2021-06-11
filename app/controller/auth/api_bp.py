@@ -71,8 +71,9 @@ class JadasAPI(Resource):
     def post(self):
         args = JadasAPIArgs.parse_args()
         try:
-            dt = mysql_query("select count(*) as 'count' from Hits.Data where ID ={}".format(args['ID']))
-            if dt[0]['count'] == 0:
+            dt = mysql_query("select ID from Hits.Data order by DID desc limit 1;")
+            print(dt)
+            if str(dt[0]['ID']) != str(args['ID']):
                 mysql_query('''
                     INSERT INTO `Hits`.`Data`
                     (`Meters`,`ID`)
