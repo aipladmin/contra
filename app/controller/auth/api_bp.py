@@ -46,6 +46,9 @@ systemInfoArgs.add_argument("tags",type=str,required=True)
 systemInfoArgs.add_argument("email",type=str,required=True)
 systemInfoArgs.add_argument("location",type=str,required=True)
 
+JadasAPIArgs = reqparse.RequestParser()
+JadasAPIArgs.add_argument('meters',type=int,required=True)
+
 def initialize_routes(api):
     api.add_resource(contra,'/api/registration')
     api.add_resource(login,'/api/login')
@@ -53,9 +56,21 @@ def initialize_routes(api):
     api.add_resource(changePassword,'/api/changepassword')
     api.add_resource(resetPassword,'/api/resetpassword')
     api.add_resource(systemInfo,'/api/systemInfo')
+    api.add_resource(JadasAPI,'/api/jadas')
 
 resetpasswordArgs = reqparse.RequestParser()
 resetpasswordArgs.add_argument('email',required=True,help="Email address Required.")
+
+
+class JadasAPI(Resource):
+    def get(self):
+        return "data"
+    
+    def post(self):
+        print("MADHAV")
+        args = JadasAPIArgs.parse_args()
+        print(args['meters'])
+        return "data"
 
 ############### !# CONTRA
 class contraResponseSchema(Schema):
