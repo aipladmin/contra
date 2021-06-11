@@ -71,11 +71,13 @@ class JadasAPI(Resource):
     def post(self):
         args = JadasAPIArgs.parse_args()
         try:
-            mysql_query('''
-                INSERT INTO `Hits`.`Data`
-                (`Meters`,`ID`)
-                VALUES
-                ({},{});'''.format(args['meters'],args['ID']))
+            dt = mysql_query("select count(*) as 'count' from Hits.Data where ID ={}".format(args['ID']))
+            if dt[0]['count'] == 0:
+                mysql_query('''
+                    INSERT INTO `Hits`.`Data`
+                    (`Meters`,`ID`)
+                    VALUES
+                    ({},{});'''.format(args['meters'],args['ID']))
         except pymysql.Error as e:
             return jsonify({"Error:": "could not close connection error pymysql %d: %s" %(e.args[0], e.args[1])})
         else:
