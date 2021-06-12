@@ -74,6 +74,11 @@ class germination(getUID):
         self.email=email
         getUID.__init__(self,email)
     
+    @staticmethod
+    def ShowSystem():
+        data=mysql_query("select * from Grow_System;")
+        return data
+
     def AddSystem(self,attemptname,location,tags):
         gemcode = self.email[0:3].capitalize()+attemptname[0:3].capitalize()+datetime.now().strftime("/%d%m%y/%H/%M/%S")
         AID = self.getAID()
@@ -85,3 +90,9 @@ class germination(getUID):
                             VALUES
                             ({},'{}','{}','{}','{}');'''.format(AID,attemptname,location,tags,gemcode))
         return "DI"
+
+class seeds():
+    @staticmethod
+    def ShowSeeds():
+        data = mysql_query("select * from seeds_master")
+        return data

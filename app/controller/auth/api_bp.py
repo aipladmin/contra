@@ -40,23 +40,25 @@ changePasswordArgs.add_argument('password', type=str)
 changePasswordArgs.add_argument('old_password', type=str)
 changePasswordArgs.add_argument('email', type=str)
 
-systemInfoArgs = reqparse.RequestParser()
-systemInfoArgs.add_argument("attemptName",type=str,required=True)
-systemInfoArgs.add_argument("tags",type=str,required=True)
-systemInfoArgs.add_argument("email",type=str,required=True)
-systemInfoArgs.add_argument("location",type=str,required=True)
+germination_APIArgs = reqparse.RequestParser()
+germination_APIArgs.add_argument("attemptName",type=str,required=True)
+germination_APIArgs.add_argument("tags",type=str,required=True)
+germination_APIArgs.add_argument("email",type=str,required=True)
+germination_APIArgs.add_argument("location",type=str,required=True)
 
 JadasAPIArgs = reqparse.RequestParser()
 JadasAPIArgs.add_argument('meters',type=int,required=True)
 JadasAPIArgs.add_argument('ID',type=int,required=True)
 
+# seedsAPIArgs = reqparse.RequestParser()
 def initialize_routes(api):
     api.add_resource(contra,'/api/registration')
     api.add_resource(login,'/api/login')
     api.add_resource(updateProfile,'/api/updateProfile')
     api.add_resource(changePassword,'/api/changepassword')
     api.add_resource(resetPassword,'/api/resetpassword')
-    api.add_resource(systemInfo,'/api/systemInfo')
+    api.add_resource(germination_API,'/api/germination')
+    api.add_resource(Seeds_API,'/api/seeds')
     api.add_resource(JadasAPI,'/api/jadas')
 
 resetpasswordArgs = reqparse.RequestParser()
@@ -65,7 +67,13 @@ resetpasswordArgs.add_argument('email',required=True,help="Email address Require
 
 class JadasAPI(Resource):
     def get(self):
-        data= mysql_query("Select * from Hits.Data;")
+        data= mysql_query(''' 
+        SELECT
+	    *,
+        Timestamp - LAG(Timestamp) OVER (ORDER BY Timestamp) 
+                AS Timestamps_since_last_case
+        FROM    Data
+        ORDER BY Timestamp; ''')
         return jsonify({'Result: ':data})
     
     def post(self):
@@ -218,8 +226,18 @@ class changePassword(MethodResource,Resource):
         else:
             return {'status':'No user Exist'}
 
-class systemInfo(Resource):
+class germination_API(Resource):
+    def get(self):
+        
+        data = germination.ShowSystem()
+        return jsonify({'Data':data})
+
     def post(self):
-        args = systemInfoArgs.parse_args()
+        args = germination_APIArgs.parse_args()
         germinationAPI = germination(email=args['email'])
+
         germinationAPI.AddSystem(attemptname=args['attemptName'],tags=args['tags'],location=args['location'])
+
+class Seeds_API(Resource):
+    def get(self):
+        return jsonify({"Data":seeds.ShowSeeds()})
