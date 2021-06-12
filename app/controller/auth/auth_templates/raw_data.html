@@ -11,10 +11,13 @@
     <table class="table">
         <thead class="thead-dark">
             <tr>
-                {% for x in data[0].keys() %}
-                    <th scope="col"> {{ x }} </th>
-                {% endfor %}
+                <th scope="col">DID</th>
+                <th scope="col">ID</th>
+                <th scope="col">Meters</th>
+                <th scope="col">IST</th>
                 <th scope="col">Time</th>
+                <th scope="col">Diff</th>
+                <th scope="col">Speed</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +37,12 @@
                 </td>
                 <td>
                     {{ x.IST.strftime("%H:%M:%S") }}
+                </td>
+                <td>
+                    {{ x.Timestamps_since_last_case }}
+                </td>
+                <td>
+                    6 Meters (20 Ft.)
                 </td>
             </tr>
             {% endfor %}

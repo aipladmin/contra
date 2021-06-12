@@ -15,6 +15,6 @@ hits = Blueprint('hits',
 @hits.route('/')
 @hits.route('/index')
 def getData():
-    data = mysql_query("select DID,ID,Meters,convert_tz(Timestamp,'+00:00','+5:30') as 'IST' from Hits.Data;")
+    data = mysql_query("select DID,ID,Meters,convert_tz(Timestamp,'+00:00','+5:30') as 'IST',Timestamp - LAG(Timestamp) OVER (ORDER BY Timestamp) AS Timestamps_since_last_case from Hits.Data ORDER BY Timestamp;")
 
     return render_template('raw_data.html',data=data)
