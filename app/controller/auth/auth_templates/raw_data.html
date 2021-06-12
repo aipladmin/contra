@@ -17,7 +17,7 @@
                 <th scope="col">IST</th>
                 <th scope="col">Time</th>
                 <th scope="col">Diff</th>
-                <th scope="col">Speed</th>
+                <th scope="col">Distance</th>
             </tr>
         </thead>
         <tbody>
@@ -39,10 +39,12 @@
                     {{ x.IST.strftime("%H:%M:%S") }}
                 </td>
                 <td>
-                    {{ x.Timestamps_since_last_case }}
+                    {{ x.Timestamps_since_last_case }} Sec
                 </td>
                 <td>
-                    6 Meters (20 Ft.)
+                    {% if x.Timestamps_since_last_case|int != 0  %}
+                        {{ 6/x.Timestamps_since_last_case|int }} M/s
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
