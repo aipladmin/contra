@@ -67,7 +67,13 @@ resetpasswordArgs.add_argument('email',required=True,help="Email address Require
 
 class JadasAPI(Resource):
     def get(self):
-        data= mysql_query("Select * from Hits.Data;")
+        data= mysql_query(''' 
+        SELECT
+	    *,
+        Timestamp - LAG(Timestamp) OVER (ORDER BY Timestamp) 
+                AS Timestamps_since_last_case
+        FROM    Data
+        ORDER BY Timestamp; ''')
         return jsonify({'Result: ':data})
     
     def post(self):
