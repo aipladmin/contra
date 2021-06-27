@@ -50,7 +50,24 @@ JadasAPIArgs = reqparse.RequestParser()
 JadasAPIArgs.add_argument('meters',type=int,required=True)
 JadasAPIArgs.add_argument('ID',type=int,required=True)
 
-# seedsAPIArgs = reqparse.RequestParser()
+germination_detailsAPIargs = reqparse.RequestParser()
+germination_detailsAPIargs.add_argument('germination_date',type=int,required=True)
+germination_detailsAPIargs.add_argument('avg_germination_duration',type=int,required=True)
+germination_detailsAPIargs.add_argument('average_time_of_true_leaves',type=int,required=True)
+germination_detailsAPIargs.add_argument('average_sapling_height',type=int,required=True)
+germination_detailsAPIargs.add_argument('hardening_cycle',type=int,required=True)
+germination_detailsAPIargs.add_argument('sapling_transplant_date',type=int,required=True)
+
+germination_weeklyAPIargs = reqparse.RequestParser()
+germination_weeklyAPIargs.add_argument('Date',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Period',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Volume',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Time',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Doasge_EC',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Doasge_PH',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Pesticide',type=int,required=True)
+germination_weeklyAPIargs.add_argument('Pesticide_Volume',type=int,required=True)
+
 def initialize_routes(api):
     api.add_resource(contra,'/api/registration')
     api.add_resource(login,'/api/login')
@@ -58,6 +75,8 @@ def initialize_routes(api):
     api.add_resource(changePassword,'/api/changepassword')
     api.add_resource(resetPassword,'/api/resetpassword')
     api.add_resource(germination_API,'/api/germination')
+    api.add_resource(germination_details,'/api/germination_details')
+    api.add_resource(germination_weekly,'/api/germination_weekly')
     api.add_resource(Seeds_API,'/api/seeds')
     api.add_resource(JadasAPI,'/api/jadas')
 
@@ -228,7 +247,6 @@ class changePassword(MethodResource,Resource):
 
 class germination_API(Resource):
     def get(self):
-        
         data = germination.ShowSystem()
         return jsonify({'Data':data})
 
@@ -237,7 +255,18 @@ class germination_API(Resource):
         germinationAPI = germination(email=args['email'])
 
         germinationAPI.AddSystem(attemptname=args['attemptName'],tags=args['tags'],location=args['location'])
+        return jsonify({'Data':'success'})
 
 class Seeds_API(Resource):
     def get(self):
         return jsonify({"Data":seeds.ShowSeeds()})
+
+class germination_details(Resource):
+    def post(self):
+        # germination = germination_detailsAPIargs.parse_args()
+        return jsonify({"Status":'Broken Link'})
+
+class germination_weekly(Resource):
+    def post(self):
+        # germ = germination_weeklyAPIargs.parse_args()
+        return jsonify({"Status":'AID Not provided'})
