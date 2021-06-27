@@ -69,6 +69,11 @@ class getUID():
     def getAID(self):
         AID = mysql_query("select AID from auth where Emailid='{}';".format(self.email))
         return AID
+    
+    def getGID(self):
+        email=self.email
+        GID = mysql_query("select GID from germination inner join auth ON auth.AID = germination.AID where auth.Emailid='{}';".format(email))
+        return GID
 class germination(getUID):
     def __init__(self,email):
         self.email=email
@@ -76,7 +81,7 @@ class germination(getUID):
     
     @staticmethod
     def ShowSystem():
-        data=mysql_query("select * from Grow_System;")
+        data=mysql_query("select GemCode,Attempt_Name,Location,Tags from germination;")
         return data
 
     def AddSystem(self,attemptname,location,tags):
